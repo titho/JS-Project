@@ -22,10 +22,10 @@ const SpotifyApi = new SpotifyWebApi({
 });
 
 router.get("/login", async (req: Request, res: Response) => {
-  var html = await SpotifyApi.createAuthorizeURL(scopes);
+  var authenticationUrl = await SpotifyApi.createAuthorizeURL(scopes);
   console.log("-- login endpoint called");
-  console.log(html);
-  res.send(html + "&show_dialog=true");
+  console.log(authenticationUrl);
+  res.send(authenticationUrl + "&show_dialog=true");
 });
 
 router.get("/callback", async (req: Request, res: Response) => {
@@ -49,15 +49,18 @@ router.get("/callback", async (req: Request, res: Response) => {
       function(err: Error) {
         console.log("Something went wrong!", err);
       }
-    );
+    )
 
     res.redirect("http://localhost:3000/api/me");
+
+
   } catch (err) {
     console.log("error: " + err);
     // res.redirect()
     // res.redirect('/invalid token');
   }
 });
+
 router.get("/current", async function(req: Request, res: Response) {
   await SpotifyApi.getMyCurrentPlaybackState().then(
     function(data: any) {
