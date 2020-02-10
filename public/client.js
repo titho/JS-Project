@@ -8,7 +8,7 @@ $(function() {
   
     $('#login').click(function() {
       // Call the authorize endpoint, which will return an authorize URL, then redirect to that URL
-      $.get('/authorize', function(data) {
+      $.get('/login', function(data) {
         console.log(data)
         window.location = data;
       });
