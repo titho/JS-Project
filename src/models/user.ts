@@ -1,8 +1,10 @@
+import { v4 as uuid } from 'uuid';
+import { v4 } from 'uuid/interfaces';
+
 export interface IUser {
-    spotify_id: string;
-    name: string;
-    username: string;
-    email: string;
-    password: string;
-    rooms: string[];
+    ID: v4;
+    SpotifyID: string;
+    Email: string;
+    Username: string;
+    Password: string;
 }
