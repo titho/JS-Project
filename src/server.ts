@@ -13,7 +13,6 @@ app.use(express.static("public"));
 app.use("/api", ApiController);
 
 app.post("/register", async (request: Request, response: Response) => {
-  console.log("Entering register");
   let userData = {
     Email: request.body.Email,
     Username: request.body.Username,
@@ -31,42 +30,48 @@ app.post("/register", async (request: Request, response: Response) => {
 
   await pool.connect();
 
-  const req = new sql.Request(pool);
-  const passwordHash = require("password-hash");
-  const hashedPassword = passwordHash.generate(userData.Password);
-  const query = `INSERT INTO dbo.[User] (ID, Email, Username, Password, RepeatedPassword)
-                  VALUES(NEWID(), '${userData.Email}', '${userData.Username}', '${hashedPassword}', '${hashedPassword}')`;
+  try {
+    const req = new sql.Request(pool);
+    const passwordHash = require("password-hash");
+    const hashedPassword = passwordHash.generate(userData.Password);
+    const query = `INSERT INTO dbo.[User] (ID, Email, Username, Password)
+                  VALUES(NEWID(), '${userData.Email}', '${userData.Username}', '${hashedPassword}')`;
 
-  const result = await req.query(query);
+    const result = await req.query(query);
 
-  console.dir(result);
-  response.redirect("http://localhost:3000/api/login");
+    console.dir(result);
+    response.redirect("http://localhost:3000/api/login");
+  } catch (error) {
+    response.send(error);
+  }
 });
 
-app.post("/saveSpotifyUser",
-  async (request: Request, response: Response) => {
-    const pool = new sql.ConnectionPool({
-      server: "LAPTOP-6IFUU7D3",
-      database: "SpotifyProject",
-      options: {
-        trustedConnection: true
-      }
-    });
+app.post("/saveSpotifyUser", async (request: Request, response: Response) => {
+  const pool = new sql.ConnectionPool({
+    server: "LAPTOP-6IFUU7D3",
+    database: "SpotifyProject",
+    options: {
+      trustedConnection: true
+    }
+  });
 
-    await pool.connect();
+  await pool.connect();
 
-    const req = new sql.Request(pool);
+  const req = new sql.Request(pool);
 
+  try {
     const query = `UPDATE [User]
                 SET SpotifyAccountID = '${request.query.id}'
                 WHERE Email = '${request.query.email}'`;
 
     const result = await req.query(query);
     console.dir(result);
+
     response.send("Successfully loged in.");
-    response.redirect("http://localhost:3000/api/me");
+  } catch (error) {
+    response.send(error);
   }
-);
+});
 
 // app.get("/loginSite", async (request: Request, response: Response) => {
 //   let userData = {
@@ -86,9 +91,9 @@ app.post("/saveSpotifyUser",
 
 //   const req = new sql.Request(pool);
 
-//   const query = `SELECT Password FROM [User] 
-//                     WHERE ID IN 
-//                     (SELECT ID FROM [User] 
+//   const query = `SELECT Password FROM [User]
+//                     WHERE ID IN
+//                     (SELECT ID FROM [User]
 //                         WHERE Username = '${userData.Username}')`;
 
 //   const result = await req.query(query);

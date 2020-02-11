@@ -114,10 +114,10 @@ router.get("/me", async function(req: Request, res: Response) {
       //   console.log("Email:" + data.body.email);
       //   console.log("ImageURL: " + data.body.images[0].url);
       //   console.log("AccountType: " + data.body.product);
-      // res.redirect(
-      //   `http://localhost:3000/saveSpotifyUser?id=${data.body.id}&email=${data.body.email}`
-      // );
-      res.send(data.body);
+      //res.send(data.body);
+      res.redirect(
+        `http://localhost:3000/saveSpotifyUser?id=${data.body.id}&email=${data.body.email}`
+      );
     },
     function(err: any) {
       console.log("Something went wrong!", err);
