@@ -62,7 +62,7 @@ class SpotifyManager {
         case "Play":
           return await this._spotifyApi.play().then(
             function(data: any) {
-              console.log(data);
+            //   console.log(data);
               return Promise.resolve(data);
             },
             function(err: any) {
@@ -73,11 +73,11 @@ class SpotifyManager {
         case "Pause":
           console.log("\x1b[33m", "Pausing");
           return await this._spotifyApi.pause().then(function(data: any) {
-            console.log(data);
+            // console.log(data);
             return Promise.resolve(data);
           });
         case "Seek":
-        //   console.log("Changing song to " + "\x1b[33m", uri + " at " + ms);
+          //   console.log("Changing song to " + "\x1b[33m", uri + " at " + ms);
           return await this._spotifyApi
             .play({
               uris: [uri],
@@ -94,16 +94,67 @@ class SpotifyManager {
     }
   }
 
-  public async getCurrentPlayback() {
-    return await this._spotifyApi.getMyCurrentPlaybackState().then(
-      function(data: any) {
-        console.log(data.body);
+  private isEmptyObject(obj: any) {
+    return !Object.keys(obj).length;
+  }
 
+
+
+  public async getCurrentPlayback() {
+    let that = this;
+    return await this._spotifyApi.getMyCurrentPlaybackState().then(
+      function(data: any, err: Error) {
+        if(that.isEmptyObject(data.body)){
+            return {};
+        }
         return {
           song_id: data.body.item.id,
           uri: data.body.item.uri,
-          songProgress: data.body.progress_ms
+          songProgress: data.body.progress_ms,
+          image_url: data.body.item.album.images[0].url
         };
+      },
+      function(err: Error) {
+        console.log("Something went wrong!", err);
+      }
+    );
+  }
+
+  public async getSong(song_id: number) {
+    return await this._spotifyApi.getTrack(song_id).then(
+      function(data: any) {
+        console.log("Getting song...");
+        // console.log(data.body);
+
+        return data.body;
+      },
+      function(err: Error) {
+        console.log("Something went wrong!", err);
+      }
+    );
+  }
+
+  public async nextSong() {
+    return await this._spotifyApi.skipToNext().then(
+      function(data: any) {
+        console.log("Playing next...");
+        // console.log(data.body);
+
+        return data.body;
+      },
+      function(err: Error) {
+        console.log("Something went wrong!", err);
+      }
+    );
+  }
+
+  public async prevSong() {
+    return await this._spotifyApi.skipToPrevious().then(
+      function(data: any) {
+        console.log("Playing previous...");
+        // console.log(data.body);
+
+        return data.body;
       },
       function(err: Error) {
         console.log("Something went wrong!", err);
@@ -135,14 +186,14 @@ class SpotifyManager {
   public async GetMe() {
     var result = await this._spotifyApi.getMe().then(
       function(data: any) {
-        console.log("Name: " + "\x1b[31m%s\x1b[0m", data.body.display_name);
-        console.log("Email:" + "\x1b[31m%s\x1b[0m", data.body.email);
-        console.log(
-          "ImageURL: " + "\x1b[31m%s\x1b[0m",
-          data.body.images[0].url
-        );
-        console.log("Id:" + "\x1b[31m%s\x1b[0m", data.body.id);
-        console.log("AccountType: " + "\x1b[31m%s\x1b[0m", data.body.product);
+        // console.log("Name: " + "\x1b[31m%s\x1b[0m", data.body.display_name);
+        // console.log("Email:" + "\x1b[31m%s\x1b[0m", data.body.email);
+        // console.log(
+        //   "ImageURL: " + "\x1b[31m%s\x1b[0m",
+        //   data.body.images[0].url
+        // );
+        // console.log("Id:" + "\x1b[31m%s\x1b[0m", data.body.id);
+        // console.log("AccountType: " + "\x1b[31m%s\x1b[0m", data.body.product);
 
         return {
           id: data.body.id,
