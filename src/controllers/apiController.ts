@@ -52,7 +52,10 @@ router.get("/me", async function(req: Request, res: Response) {
   }
 });
 
-router.post("/createRoom", async function(request: Request, response: Response) {
+router.post("/createRoom", async function(
+  request: Request,
+  response: Response
+) {
   let currentUser = await SpotifyApi.GetMe();
   console.log("Creating room.....");
 
@@ -83,6 +86,36 @@ router.post("/createRoom", async function(request: Request, response: Response) 
     console.log("Room created");
     console.dir(result);
     response.redirect("http://localhost:3000/api/topTracks");
+  } catch (error) {
+    response.send(error);
+  }
+});
+
+router.get("/rooms", async function(request: Request, response: Response) {
+  let currentUser = await SpotifyApi.GetMe();
+  console.log("Getting all rooms created by current user.....");
+
+  const pool = new sql.ConnectionPool({
+    server: "LAPTOP-6IFUU7D3",
+    database: "SpotifyProject",
+    options: {
+      trustedConnection: true
+    }
+  });
+
+  await pool.connect();
+  try {
+    const req = new sql.Request(pool);
+
+    const query = `SELECT ID, [Name] FROM [Room]`;
+
+    const result = await req.query(query);
+    let rooms: any = [];
+
+    result.recordset.forEach((room: any) => rooms.push(room));
+
+    console.dir(rooms);
+    response.send(rooms);
   } catch (error) {
     response.send(error);
   }
