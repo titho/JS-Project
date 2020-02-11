@@ -22,7 +22,8 @@ class SpotifyManager {
       "user-library-modify",
       "user-library-read",
       "user-modify-playback-state",
-      "user-read-playback-state"
+      "user-read-playback-state",
+      "user-top-read"
     ];
 
     var authenticationUrl = await this._spotifyApi.createAuthorizeURL(scopes);
@@ -77,7 +78,7 @@ class SpotifyManager {
             return Promise.resolve(data);
           });
         case "Seek":
-        //   console.log("Changing song to " + "\x1b[33m", uri + " at " + ms);
+          //   console.log("Changing song to " + "\x1b[33m", uri + " at " + ms);
           return await this._spotifyApi
             .play({
               uris: [uri],
@@ -111,6 +112,21 @@ class SpotifyManager {
     );
   }
 
+  public async getCurrentUsersTopTracks() {
+    return await this._spotifyApi
+      .getMyTopTracks({
+        limit: 20,
+        offset: 1
+      })
+      .then(
+        function(data: any) {
+          return data;
+        },
+        function(error: Error) {
+          console.log("Something went wrong!", error);
+        }
+      );
+  }
   //   router.get("/saved", async function(req: Request, res: Response) {
   //     await _spotifyApi
   //       .getMySavedTracks({

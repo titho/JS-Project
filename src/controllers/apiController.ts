@@ -1,7 +1,7 @@
 import { Router, Request, Response, request, response } from "express";
 require("dotenv").config();
 import { IUser } from "../models/user";
-import { IRoom } from "../models/room";
+//import { IRoom } from "../models/room";
 
 import SpotifyManager from "../services/spotifyManager";
 const SpotifyApi = new SpotifyManager();
@@ -44,10 +44,68 @@ router.get(
 router.get("/me", async function(req: Request, res: Response) {
   try {
     let result = await SpotifyApi.GetMe();
-    res.redirect(`http://localhost:3000/saveSpotifyUser?email=${result.email}&id=${result.id}`);
-
+    res.redirect(
+      `http://localhost:3000/saveSpotifyUser?email=${result.email}&id=${result.id}`
+    );
   } catch (err) {
     res.send(err);
+  }
+});
+
+router.post("/createRoom", async function(request: Request, response: Response) {
+  let currentUser = await SpotifyApi.GetMe();
+  console.log("Creating room.....");
+
+  const data = {
+    Name: request.body.Name,
+    OwnerID: currentUser.id,
+    IsPlaying: false
+  };
+
+  console.log(data);
+
+  const pool = new sql.ConnectionPool({
+    server: "LAPTOP-6IFUU7D3",
+    database: "SpotifyProject",
+    options: {
+      trustedConnection: true
+    }
+  });
+
+  await pool.connect();
+  try {
+    const req = new sql.Request(pool);
+
+    const query = `INSERT INTO dbo.[Room] (ID, Name, OwnerID, IsPlaying)
+                  VALUES(NEWID(), '${data.Name}', '${data.OwnerID}', '${data.IsPlaying}')`;
+
+    const result = await req.query(query);
+    console.log("Room created");
+    console.dir(result);
+    response.redirect("http://localhost:3000/api/topTracks");
+  } catch (error) {
+    response.send(error);
+  }
+});
+
+router.get("/topTracks", async function(req: Request, res: Response) {
+  console.log("Getting top tracks.................");
+  try {
+    let topTracks = await SpotifyApi.getCurrentUsersTopTracks();
+    let tracks: any = [];
+
+    topTracks.body.items.forEach((track: any) =>
+      tracks.push({
+        id: track.id,
+        artist: track.artists[0].name,
+        name: track.name
+      })
+    );
+
+    res.send(tracks);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
   }
 });
 
@@ -89,7 +147,6 @@ router.route("/play").post(
 );
 
 export const ApiController: Router = router;
-
 
 // router.get("/saved", async function(req: Request, res: Response) {
 //   await _spotifyApi
