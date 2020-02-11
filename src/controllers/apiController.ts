@@ -1,7 +1,8 @@
-import { Router, Request, Response, request } from "express";
+import { Router, Request, Response, request, response } from "express";
 require("dotenv").config();
 
 const SpotifyWebApi = require("spotify-web-api-node");
+const sql = require("mssql/msnodesqlv8");
 const router: Router = Router();
 
 let scopes = [
@@ -49,11 +50,9 @@ router.get("/callback", async (req: Request, res: Response) => {
       function(err: Error) {
         console.log("Something went wrong!", err);
       }
-    )
+    );
 
     res.redirect("http://localhost:3000/api/me");
-
-
   } catch (err) {
     console.log("error: " + err);
     // res.redirect()
@@ -111,10 +110,13 @@ router.get("/saved", async function(req: Request, res: Response) {
 router.get("/me", async function(req: Request, res: Response) {
   await SpotifyApi.getMe().then(
     function(data: any) {
-    //   console.log("Name: " + data.body["display_name"]);
-    //   console.log("Email:" + data.body.email);
-    //   console.log("ImageURL: " + data.body.images[0].url);
-    //   console.log("AccountType: " + data.body.product);
+      //   console.log("Name: " + data.body["display_name"]);
+      //   console.log("Email:" + data.body.email);
+      //   console.log("ImageURL: " + data.body.images[0].url);
+      //   console.log("AccountType: " + data.body.product);
+      // res.redirect(
+      //   `http://localhost:3000/saveSpotifyUser?id=${data.body.id}&email=${data.body.email}`
+      // );
       res.send(data.body);
     },
     function(err: any) {
