@@ -1,10 +1,11 @@
-import { Router, Request, Response, request } from "express";
+import { Router, Request, Response, request, response } from "express";
 require("dotenv").config();
 import { IUser } from "../models/user";
 import { IRoom } from "../models/room";
 
 import SpotifyManager from "../services/spotifyManager";
 const SpotifyApi = new SpotifyManager();
+const sql = require("mssql/msnodesqlv8");
 
 const router: Router = Router();
 

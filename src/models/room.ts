@@ -1,9 +1,11 @@
+import { v4 as uuid } from 'uuid';
+import { v4 } from 'uuid/interfaces';
+
 export interface IRoom {
-    id: string;
-    name: string;
-    owner_id: string;
-    participants: string[];
-    playback: string;
-    playback_ms: string;
-    isPlaying: boolean;
+    ID: v4;
+    Name: string;
+    OwnerID: string;
+    LastPlayed: string;
+    PlaybackMS: string;
+    IsPlaying: boolean;
 }
