@@ -121,6 +121,63 @@ router.get("/rooms", async function(request: Request, response: Response) {
   }
 });
 
+router.get("/enterRoom", async function (request: Request, response: Response) {
+  let currentUser = await SpotifyApi.GetMe();
+  console.log("Entering room.....");
+
+  const pool = new sql.ConnectionPool({
+    server: "LAPTOP-6IFUU7D3",
+    database: "SpotifyProject",
+    options: {
+      trustedConnection: true
+    }
+  });
+
+  await pool.connect();
+  try {
+    const req = new sql.Request(pool);
+
+    const query = `INSERT INTO User_Room(ID, Ref_User_ID, Ref_Room_ID)
+                    VALUES(NEWID(), ${currentUser.id}, '${request.query.id}')`;
+
+    const result = await req.query(query);
+    console.log("Entered room successfully.");
+    console.dir(result);
+    response.redirect("http://localhost:3000/api/topTracks");
+  } catch (error) {
+    console.log(error)
+    response.send("You are already in this room!");
+  }
+});
+
+router.get("/leaveRoom", async function (request: Request, response: Response) {
+  let currentUser = await SpotifyApi.GetMe();
+  console.log("Leaving room.....");
+
+  const pool = new sql.ConnectionPool({
+    server: "LAPTOP-6IFUU7D3",
+    database: "SpotifyProject",
+    options: {
+      trustedConnection: true
+    }
+  });
+
+  await pool.connect();
+  try {
+    const req = new sql.Request(pool);
+
+    const query = `DELETE FROM [User_Room] 
+                    WHERE Ref_User_ID = '${currentUser.id}' AND Ref_Room_ID = '${request.query.id}'`;
+
+    const result = await req.query(query);
+    console.log("Left room successfully.");
+    console.dir(result);
+    response.redirect("http://localhost:3000/api/rooms");
+  } catch (error) {
+    response.send(error);
+  }
+});
+
 router.get("/topTracks", async function(req: Request, res: Response) {
   console.log("Getting top tracks.................");
   try {

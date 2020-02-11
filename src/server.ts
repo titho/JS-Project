@@ -51,7 +51,7 @@ app.post("/register", async (request: Request, response: Response) => {
   }
 });
 
-app.post("/saveSpotifyUser", async (request: Request, response: Response) => {
+app.get("/saveSpotifyUser", async (request: Request, response: Response) => {
   const pool = new sql.ConnectionPool({
     server: "LAPTOP-6IFUU7D3",
     database: "SpotifyProject",
@@ -72,44 +72,11 @@ app.post("/saveSpotifyUser", async (request: Request, response: Response) => {
     const result = await req.query(query);
     console.dir(result);
 
-    response.send("Successfully loged in.");
+    response.redirect("http://localhost:3000/api/rooms");
   } catch (error) {
     response.send(error);
   }
 });
-
-// app.get("/loginSite", async (request: Request, response: Response) => {
-//   let userData = {
-//     Username: request.body.Username,
-//     Password: request.body.Password
-//   };
-
-//   const pool = new sql.ConnectionPool({
-//     server: "LAPTOP-6IFUU7D3",
-//     database: "SpotifyProject",
-//     options: {
-//       trustedConnection: true
-//     }
-//   });
-
-//   await pool.connect();
-
-//   const req = new sql.Request(pool);
-
-//   const query = `SELECT Password FROM [User]
-//                     WHERE ID IN
-//                     (SELECT ID FROM [User]
-//                         WHERE Username = '${userData.Username}')`;
-
-//   const result = await req.query(query);
-//   const passwordHash = require("password-hash");
-
-//   if (passwordHash.verify(userData.Password, result.recordset[0].Password)) {
-//     response.send("User successfully loged in");
-//   } else {
-//     response.send("Log in failed!");
-//   }
-// });
 
 app.get("/logout", function(req, res) {
   res.status(401).send("You are now logged out.");
