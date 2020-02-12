@@ -63,7 +63,7 @@ class SpotifyManager {
         case "Play":
           return await this._spotifyApi.play().then(
             function(data: any) {
-            //   console.log(data);
+              //   console.log(data);
               return Promise.resolve(data);
             },
             function(err: any) {
@@ -95,18 +95,33 @@ class SpotifyManager {
     }
   }
 
+  public async play(tracks: string[]) {
+    try {
+      return await this._spotifyApi
+        .play(JSON.parse(`{
+          "uris": ${tracks},
+          "offset": 1
+        }`))
+        .then(function(data: any) {
+          console.log("\x1b[38m", "Success: " + data);
+          return Promise.resolve(data);
+        });
+    } catch (err) {
+      console.log(err);
+      return Promise.resolve();
+    }
+  }
+
   private isEmptyObject(obj: any) {
     return !Object.keys(obj).length;
   }
-
-
 
   public async getCurrentPlayback() {
     let that = this;
     return await this._spotifyApi.getMyCurrentPlaybackState().then(
       function(data: any, err: Error) {
-        if(that.isEmptyObject(data.body)){
-            return {};
+        if (that.isEmptyObject(data.body)) {
+          return {};
         }
         return {
           song_id: data.body.item.id,
@@ -174,6 +189,19 @@ class SpotifyManager {
       },
       function(err: Error) {
         console.log("Something went wrong!", err);
+      }
+    );
+  }
+
+  public async shuffle() {
+    return await this._spotifyApi.setShuffle(true).then(
+      function(data: any) {
+        console.log("Suffling..");
+
+        return data.body;
+      },
+      function(error: Error) {
+        console.log("Something went wrong!", error);
       }
     );
   }

@@ -334,6 +334,66 @@ router.route("/currently").get(
   }
 );
 
+router.route("/shuffle").put(
+  async function(request: Request, response: Response) {
+    try {
+      let result = await SpotifyApi.shuffle();
+      response.send("Playback on shuffle");
+
+    }
+    catch(error) {
+      console.log("Something went wrong!", error);
+    }
+  } 
+);
+
+router.put("/activateRoom", async function(request: Request, response: Response) {
+  try {
+
+    const pool = new sql.ConnectionPool({
+      server: "LAPTOP-6IFUU7D3",
+      database: "SpotifyProject",
+      options: {
+        trustedConnection: true
+      }
+    });
+
+    await pool.connect();
+    const req = new sql.Request(pool);
+
+    console.log("Activating room");
+
+    const activateQuery = `UPDATE [ROOM]
+                        SET IsPlaying = 1
+                        WHERE ID = '${request.query.id}'`;
+                            
+    const resultActivated = await req.query(activateQuery);
+
+    const roomTracks = `SELECT ID FROM dbo.[Song]
+                        WHERE FK_Ref_Room = '${request.query.id}'`;
+                            
+    const resultTracksIDs = await req.query(roomTracks);
+    let tracksIDs: any = [];
+
+    resultTracksIDs.recordset.forEach((track: any) => {
+      tracksIDs.push(`spotify:track:${track.ID}`);
+    });
+
+    //{"uris": ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
+
+    console.log(tracksIDs);
+    SpotifyApi.play(tracksIDs);
+
+    //response.send(resultTracksIDs.recordset);
+
+    response.redirect(`http://localhost:3000/api/roomTracks?id=${request.query.id}`);
+  }
+  catch (error) {
+    console.log("Something went wrong!", error);
+  }
+
+});
+
 // export async function Player() {
 //   try {
 //     let result = await SpotifyApi.getCurrentPlayback();
