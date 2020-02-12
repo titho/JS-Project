@@ -10,7 +10,6 @@ const socketIO = require("socket.io");
 const axios = require("axios");
 const pug = require("pug");
 
-
 const app: express.Application = express();
 const port: number = +(process.env.PORT || 3000);
 
@@ -36,19 +35,25 @@ app.use(express.static("public"));
 // make connection with user from server side
 io.on("connection", function(socket: Socket) {
   console.log("New client connected");
-
   setInterval(async () => {
     try {
       const curr = await axios.get("http://localhost:3000/api/currently");
 
-      const song = await axios.get(`http://localhost:3000/api/getsong?id=${curr.data.song_id}`);
+      const song = await axios.get(
+        `http://localhost:3000/api/getsong?id=${curr.data.song_id}`
+      );
 
-      socket.broadcast.emit("playback", { 
-        progress: msToHMS(curr.data.songProgress), 
-        name: song.data.name, 
-        artist: song.data.artist } );
+      socket.broadcast.emit("playback", {
+        progress: msToHMS(curr.data.songProgress),
+        name: song.data.name,
+        artist: song.data.artist
+      });
     } catch (error) {
-      console.error(`Error: ${error}`);
+      if (error.statusCode === 401) {
+        await setTimeout(() => console.log(), 8000);
+      } else {
+        console.error(`Error: ${error}`);
+      }
     }
   }, 1000);
 
@@ -86,7 +91,7 @@ app.use("/api", ApiController);
 // });
 
 // app.get("/player", async (request: Request, response: Response) => {
-  
+
 app.post("/register", async (request: Request, response: Response) => {
   let userData = {
     Email: request.body.Email,
