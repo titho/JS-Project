@@ -98,10 +98,9 @@ class SpotifyManager {
   public async play(tracks: string[]) {
     try {
       return await this._spotifyApi
-        .play(JSON.parse(`{
-          "uris": ${tracks},
-          "offset": 1
-        }`))
+        .play({
+          uris: tracks,
+        })
         .then(function(data: any) {
           console.log("\x1b[38m", "Success: " + data);
           return Promise.resolve(data);
