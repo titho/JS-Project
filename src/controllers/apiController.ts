@@ -355,7 +355,7 @@ router.route("/shuffle").put(
   } 
 );
 
-router.put("/activateRoom", async function(request: Request, response: Response) {
+router.get("/activateRoom", async function(request: Request, response: Response) {
   try {
 
     const pool = new sql.ConnectionPool({
@@ -390,7 +390,7 @@ router.put("/activateRoom", async function(request: Request, response: Response)
     //console.log(tracksIDs);
     await SpotifyApi.play(tracksIDs);
 
-    response.redirect(`http://localhost:3000/api/roomTracks?id=${request.query.id}`);
+    response.redirect(`http://localhost:3000/api/player`);
   }
   catch (error) {
     console.log("Something went wrong!", error);
@@ -451,40 +451,44 @@ router.route("/getsong").get(
 //     console.log("Something went wrong!", err);
 //   }
 // }
-router.route("/browse").get(
-  async function(req: Request, res: Response) {
-    res.render("chooseRoom");
-  }
-)
+// router.route("/browse").get(
+//   async function(req: Request, res: Response) {
+//     res.render("chooseRoom");
+//   }
+// )
 
 router.get("/browse", async (request: Request, response: Response) => {
-  
-  let getsInfoFromEndpoint = [
-    {
-      id: "123-456",
-      roomname: "Room_A",
-      song: "50 Cent - P.I.M.P",
-      owner: "vasko",
-      image_url:
-        "https://images.theconversation.com/files/258026/original/file-20190208-174861-nms2kt.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=926&fit=clip"
-    },
-    {
-      id: "123-456",
-      roomname: "Room_B",
-      song: "50 Cent - P.I.M.P",
-      owner: "vasko",
-      image_url:
-        "https://images.theconversation.com/files/258026/original/file-20190208-174861-nms2kt.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=926&fit=clip"
-    },
-    {
-      id: "123-456",
-      roomname: "Room_C",
-      song: "50 Cent - P.I.M.P",
-      owner: "vasko",
-      image_url:
-        "https://images.theconversation.com/files/258026/original/file-20190208-174861-nms2kt.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=926&fit=clip"
-    }
-  ];
+  console.log("Browsing...");
+  let rooms = await axios.get("http://localhost:3000/api/rooms");
+  console.log(rooms.body);
+  let getsInfoFromEndpoint:any = [];
+  rooms.data.forEach((room: any) => getsInfoFromEndpoint.push(room))
+  // let getsInfoFromEndpoint = [
+  //   {
+  //     id: "123-456",
+  //     roomname: "Room_A",
+  //     song: "50 Cent - P.I.M.P",
+  //     owner: "vasko",
+  //     image_url:
+  //       "https://images.theconversation.com/files/258026/original/file-20190208-174861-nms2kt.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=926&fit=clip"
+  //   },
+  //   {
+  //     id: "123-456",
+  //     roomname: "Room_B",
+  //     song: "50 Cent - P.I.M.P",
+  //     owner: "vasko",
+  //     image_url:
+  //       "https://images.theconversation.com/files/258026/original/file-20190208-174861-nms2kt.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=926&fit=clip"
+  //   },
+  //   {
+  //     id: "123-456",
+  //     roomname: "Room_C",
+  //     song: "50 Cent - P.I.M.P",
+  //     owner: "vasko",
+  //     image_url:
+  //       "https://images.theconversation.com/files/258026/original/file-20190208-174861-nms2kt.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=926&fit=clip"
+  //   }
+  // ];
 
   response.render("chooseroom", { rooms: getsInfoFromEndpoint });
 });
