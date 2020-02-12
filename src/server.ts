@@ -1,6 +1,6 @@
 import bodyParser from "body-parser";
 import express, { Request, Response, request } from "express";
-import { ApiController } from "./controllers/apiController";
+import { ApiController, msToHMS } from "./controllers/apiController";
 import path from "path";
 import { Socket } from "socket.io";
 require("dotenv").config();
@@ -39,9 +39,14 @@ io.on("connection", function(socket: Socket) {
 
   setInterval(async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/currently"); // Getting the data from DarkSky
-      // console.log("Progress: ", res.data.songProgress);
-      socket.broadcast.emit("playback", res.data.songProgress); // Emitting a new message. It will be consumed by the client
+      const curr = await axios.get("http://localhost:3000/api/currently");
+
+      const song = await axios.get(`http://localhost:3000/api/getsong?id=${curr.data.song_id}`);
+
+      socket.broadcast.emit("playback", { 
+        progress: msToHMS(curr.data.songProgress), 
+        name: song.data.name, 
+        artist: song.data.artist } );
     } catch (error) {
       console.error(`Error: ${error}`);
     }

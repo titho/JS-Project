@@ -134,6 +134,33 @@ router.route("/currently").get(
   }
 );
 
+router.route("/getsong").get(
+  async function(req: Request, res: Response) {
+    try {
+      let song_id = req.query.id;
+
+      let result = await SpotifyApi.getSong(song_id).then((data: any) => {
+        return {
+          name: data.name,
+          artist: data.artists[0].name,
+          image: data.album.images[0]
+        };
+      });
+      res.send({
+        name: result.name,
+        artist: result.artist,
+        image: result.image,
+        id: song_id
+      });
+    } catch (err) {
+      console.log("Something went wrong!", err);
+    }
+  },
+  function(err: Error) {
+    console.log("Something went wrong!", err);
+  }
+);
+
 // export async function Player() {
 //   try {
 //     let result = await SpotifyApi.getCurrentPlayback();
@@ -198,7 +225,7 @@ router
     }
   });
 
-function msToHMS(millis: number) {
+export function msToHMS(millis: number) {
   var minutes = Math.floor(millis / 60000);
   var seconds = parseInt(((millis % 60000) / 1000).toFixed(0));
   return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
