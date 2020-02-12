@@ -1,9 +1,3 @@
-// client-side js
-// run by the browser each time your view template is loaded
-
-// by default, you've got jQuery,
-// add other scripts at the bottom of index.html
-
 $(function() {
   
     $('#login').click(function() {
@@ -13,6 +7,8 @@ $(function() {
         window.location.replace(data);
       });
     });
+  });
+
     
     // const hash = window.location.hash
     //   .substring(1)
@@ -50,22 +46,3 @@ $(function() {
     //     let content = $(`<h2>${data}</h2>`)
     //     content.prependTo('#data-container');
     //   });
-
-    //   $.get({url: '/myendpoint', headers: {"Authorization": `Bearer ${hash.access_token}`}}, function(data) {
-    //     // "Data" is the array of track objects we get from the API. See server.js for the function that returns it.
-    //     console.log(data)
-  
-    //     var title = $('<h3>Your top tracks on Spotify:</h3>');
-    //     title.prependTo('#data-container');
-  
-    //     // For each of the tracks, create an element
-    //     data.items.forEach(function(track) {
-    //       var trackDiv = $('<li class="track"></li>');
-    //       trackDiv.text(track.name);
-    //       trackDiv.appendTo('#data-container ol');
-    //     });
-  
-    //   });
-    // }
-  
-  });
