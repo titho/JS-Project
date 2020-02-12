@@ -3,26 +3,31 @@ head
   link(rel='stylesheet' href='/styles.css')
   link(href='https://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css')
   script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js')
-.player
-  canvas
-  .song
-    .artist #{artist}
-    .name#name #{songName}
-  .playarea
-    .prevSong#prev(onclick="prev()")
-    .play#play(onclick="play()")
-    .pause#pause(onclick="pause()")
-    .nextSong#next(onclick="next()")
-  .soundControl
-  .time#time #{time_ms}
-  //- script.
-  //-     const socket = io();
-  //-     socket.on("playback", data =>
-  //-     {
-  //-       console.log(data)
-  //-       this.document.getElementById("time").value = data;
-  //-     });
-  
+body
+  .player
+    canvas
+    .song
+      .artist#artist #{artist}
+      .name#name #{songName}
+    .playarea
+      .prevSong#prev(onclick="prev()")
+      .play#play(onclick="play()")
+      .pause#pause(onclick="pause()")
+      .nextSong#next(onclick="next()")
+    .soundControl
+    .time#time #{time_ms}
+  script.
+      const socket = io();
+      socket.on("playback", data =>
+      {
+        console.log(data)
+        if(data)
+      {
+        this.document.getElementById("time").innerHTML = data.progress;
+        this.document.getElementById("name").innerHTML = data.name;
+        this.document.getElementById("artist").innerHTML = data.artist;
+      }
+      });
 script(src='https://code.jquery.com/jquery-1.11.1.js')
 //- script(src='../public/client.js')
 script.
@@ -44,12 +49,16 @@ script.
 script.
   function next(){
       $.post('/api/next', function(data) {
+               document.getElementById("pause").style.display = "inline-block";
+       document.getElementById("play").style.display = "none";
         //- window.location.replace(data);
       });
   };
 script.
   function prev(){
       $.post('/api/prev', function(data) {
+               document.getElementById("pause").style.display = "inline-block";
+       document.getElementById("play").style.display = "none";
         //- window.location.replace(data);
       });
   };
