@@ -98,7 +98,7 @@ app.post("/register", async (request: Request, response: Response) => {
   }
 });
 
-app.post("/saveSpotifyUser", async (request: Request, response: Response) => {
+app.get("/saveSpotifyUser", async (request: Request, response: Response) => {
   const pool = new sql.ConnectionPool({
     server: "LAPTOP-6IFUU7D3",
     database: "SpotifyProject",
@@ -119,7 +119,7 @@ app.post("/saveSpotifyUser", async (request: Request, response: Response) => {
     const result = await req.query(query);
     console.dir(result);
 
-    response.send("Successfully loged in.");
+    response.redirect("http://localhost:3000/api/rooms");
   } catch (error) {
     response.send(error);
   }

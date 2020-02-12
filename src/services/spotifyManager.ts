@@ -22,7 +22,8 @@ class SpotifyManager {
       "user-library-modify",
       "user-library-read",
       "user-modify-playback-state",
-      "user-read-playback-state"
+      "user-read-playback-state",
+      "user-top-read"
     ];
 
     var authenticationUrl = await this._spotifyApi.createAuthorizeURL(scopes);
@@ -62,7 +63,7 @@ class SpotifyManager {
         case "Play":
           return await this._spotifyApi.play().then(
             function(data: any) {
-            //   console.log(data);
+              //   console.log(data);
               return Promise.resolve(data);
             },
             function(err: any) {
@@ -94,11 +95,25 @@ class SpotifyManager {
     }
   }
 
+  public async play(tracks: string[]) {
+    try {
+      return await this._spotifyApi
+        .play({
+          uris: tracks,
+        })
+        .then(function(data: any) {
+          console.log("\x1b[38m", "Success: " + data);
+          return Promise.resolve(data);
+        });
+    } catch (err) {
+      console.log(err);
+      return Promise.resolve();
+    }
+  }
+
   private isEmptyObject(obj: any) {
     return !Object.keys(obj).length;
   }
-
-
 
   public async getCurrentPlayback() {
     let that = this;
@@ -120,6 +135,21 @@ class SpotifyManager {
     );
   }
 
+  public async getCurrentUsersTopTracks() {
+    return await this._spotifyApi
+      .getMyTopTracks({
+        limit: 20,
+        offset: 1
+      })
+      .then(
+        function(data: any) {
+          return data;
+        },
+        function(error: Error) {
+          console.log("Something went wrong!", error);
+        }
+      );
+  }
   public async getSong(song_id: number) {
     return await this._spotifyApi.getTrack(song_id).then(
       function(data: any) {
@@ -157,6 +187,19 @@ class SpotifyManager {
       },
       function(err: Error) {
         console.log("Something went wrong!", err);
+      }
+    );
+  }
+
+  public async shuffle() {
+    return await this._spotifyApi.setShuffle(true).then(
+      function(data: any) {
+        console.log("Suffling..");
+
+        return data.body;
+      },
+      function(error: Error) {
+        console.log("Something went wrong!", error);
       }
     );
   }
