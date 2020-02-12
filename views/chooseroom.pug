@@ -1,0 +1,138 @@
+doctype html
+head
+  link(rel='stylesheet' href='/chooseroom.css')
+  link(rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous")
+  script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js' integrity='sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1' crossorigin='anonymous')
+  script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js' integrity='sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM' crossorigin='anonymous')
+body
+.container.py-5
+  header.text-center
+    h1.display-4 Browse available rooms
+    p.font-italic.mb-0 Browse and pick a room you want to!
+    p.font-italic
+  .row
+    .col-lg-11.mx-auto
+      .row.py-5
+        each element in rooms
+          .col-lg-4
+              figure.caption-3.mb-0.shadow-sm.p-3.bg-white
+              img.w-100(src=element.image_url alt='')
+              figcaption.px-5.py-3.bg-white.shadow-sm
+                h1.h3.mb-1.font-weight-bold#roomname= element.roomname
+                p.mb-0.text-small.text-muted Now playing:
+                h2.h5.mb-1.font-weight-bold.font-italic#songanme= element.song
+                p.mb-0.text-small.text-muted Owner:
+                h5.h5.mb-1.font-weight-bold.font-italic#owner= element.owner
+                br
+                button.btn.btn-success(type='button')(onclick="join(this)")(id=element.id) Join
+                script.
+                  function join($this){
+                    console.log($this.id);
+                  }
+                  
+      //- // FIRST EXAMPLE ===================================
+      //- .row.py-5
+      //-   each element in rooms
+      //-       figure.rounded.p-3.bg-white.shadow-sm
+      //-         img.w-100.card-img-top(src='https://i.postimg.cc/CxckQJW1/6.png' alt='')
+      //-         figcaption.p-4.card-img-bottom
+      //-           h2.h5.font-weight-bold.mb-2.font-italic Image Caption
+      //-           p.mb-0.text-small.text-muted.font-italic Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor.
+      //-   .col-lg-4
+      //-     figure.rounded.p-3.bg-white.shadow-sm
+      //-       img.w-100.card-img-top(src='https://i.postimg.cc/BbvGMSDt/6.png' alt='')
+      //-       figcaption.p-4.card-img-bottom
+      //-         h2.h5.font-weight-bold.mb-2.font-italic Image Caption
+      //-         p.mb-0.text-small.text-muted.font-italic Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor.
+      //-   .col-lg-4
+      //-     figure.rounded.p-3.bg-white.shadow-sm
+      //-       img.w-100.card-img-top(src='https://i.postimg.cc/W3bKP94H/6.png' alt='')
+      //-       figcaption.p-4.card-img-bottom
+      //-         h2.h5.font-weight-bold.mb-2.font-italic Image Caption
+      //-         p.mb-0.text-small.text-muted.font-italic Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor.
+      //- .separator.my-3
+      //- // SECOND EXAMPLE ===================================
+      //- .row.my-5
+      //-   .col-lg-4
+      //-     // item
+      //-     figure.rounded.caption-1
+      //-       img.w-100.card-img-top.border.border-white.border-md(src='https://i.postimg.cc/LsMkfnKk/5.jpg' alt='')
+      //-       figcaption.px-5.py-4.text-right.text-light
+      //-         h2.h5.font-weight-bold.mb-0 Image caption
+      //-         p.text-small By Jason Doe
+      //-   .col-lg-4
+      //-     // item
+      //-     figure.rounded.caption-1
+      //-       img.w-100.card-img-top.border.border-white.border-md(src='https://i.postimg.cc/P5NyZ9K6/6.jpg' alt='')
+      //-       figcaption.px-5.py-4.text-right.text-light
+      //-         h2.h5.font-weight-bold.mb-0 Image caption
+      //-         p.text-small By Jason Doe
+      //-   .col-lg-4
+      //-     // item
+      //-     figure.rounded.caption-1
+      //-       img.w-100.card-img-top.border.border-white.border-md(src='https://i.postimg.cc/SRDLYf9F/7.jpg' alt='')
+      //-       figcaption.px-5.py-4.text-right.text-light
+      //-         h2.h5.font-weight-bold.mb-0 Image caption
+      //-         p.text-small By Jason Doe
+      //- .separator.my-2
+      //- // BIG EXAMPLE ===================================
+      //- .py-5
+      //-   h2.h4.font-italic.mb-4 Big image caption
+      //-   .row
+      //-     .col-lg-5
+      //-       img.w-100.mb-4.border.border-md.border-white.shadow-sm(src='https://i.postimg.cc/Qxrz8xV7/4.jpg' alt='')
+      //-     .col-lg-7
+      //-       p.font-italic.text-muted
+      //-         | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Optio ipsum quaerat, itaque sint odit id beatae, vero aliquam numquam placeat officiis fugiat, consequuntur est ut fugit amet illum obcaecati sed.
+      //-       p.font-italic.text-muted
+      //-         | div Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consectetur iure dolore dolorum eum ex, expedita voluptate est adipisci repudiandae. Minus tenetur ut veritatis non hic beatae velit? Eius, totam, officia?
+      //-       p.font-italic.text-muted
+      //-         | Enim numquam autem, suscipit repellat vero, voluptas adipisci provident ad quidem dolorum minus, architecto. Nostrum deleniti nesciunt consequatur tempora repudiandae quos quas, animi perspiciatis nam consectetur earum adipisci, repellendus laudantium.
+      //-   p.font-italic.text-muted.mb-0
+      //-     | Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+      //- .separator.my-2
+      //- // THIRD EXAMPLE ===================================
+      //- .row.py-5
+      //-   .col-lg-4
+      //-     figure.caption-2.mb-0.shadow-sm.border.border-white.border-md
+      //-       img.w-100(src='https://i.postimg.cc/pTkkKvN6/14.jpg' alt='')
+      //-       figcaption.p-4.bg-white
+      //-         h2.h5.font-weight-bold.mb-2.font-italic Image Caption
+      //-         p.mb-0.text-small.font-italic.text-muted Lorem ipsum dolor sit amet, consect adipisicing elit.
+      //-   .col-lg-4
+      //-     figure.caption-2.mb-0.shadow-sm.border.border-white.border-md
+      //-       img.w-100(src='https://i.postimg.cc/sgRHWsv3/16.jpg' alt='')
+      //-       figcaption.p-4.bg-white
+      //-         h2.h5.font-weight-bold.mb-2.font-italic Image Caption
+      //-         p.mb-0.text-small.font-italic.text-muted Lorem ipsum dolor sit amet, consect adipisicing elit.
+      //-   .col-lg-4
+      //-     figure.caption-2.mb-0.shadow-sm.border.border-white.border-md
+      //-       img.w-100(src='https://i.postimg.cc/TwhtxPHJ/18.jpg' alt='')
+      //-       figcaption.p-4.bg-white
+      //-         h2.h5.font-weight-bold.mb-2.font-italic Image Caption
+      //-         p.mb-0.text-small.font-italic.text-muted Lorem ipsum dolor sit amet, consect adipisicing elit.
+      //- .separator.my-2
+      //- // THIRD EXAMPLE ===================================
+      //- .row.py-5
+      //-   .col-lg-4
+      //-     // Item
+      //-     figure.caption-3.mb-0.shadow-sm.p-3.bg-white
+      //-       img.w-100(src='https://i.postimg.cc/CxckQJW1/6.png' alt='')
+      //-       figcaption.px-5.py-3.bg-white.shadow-sm
+      //-         h2.h5.mb-1.font-weight-bold.font-italic Image Caption
+      //-         p.mb-0.text-small.font-italic.text-muted Lorem ipsum dolor.
+      //-   .col-lg-4
+      //-     // Item
+      //-     figure.caption-3.mb-0.shadow-sm.p-3.bg-white
+      //-       img.w-100(src='https://i.postimg.cc/BbvGMSDt/6.png' alt='')
+      //-       figcaption.px-5.py-3.bg-white.shadow-sm
+      //-         h2.h5.mb-1.font-weight-bold.font-italic Image Caption
+      //-         p.mb-0.text-small.font-italic.text-muted Lorem ipsum dolor.
+      //-   .col-lg-4
+      //-     // Item
+      //-     figure.caption-3.mb-0.shadow-sm.p-3.bg-white
+      //-       img.w-100(src='https://i.postimg.cc/W3bKP94H/6.png' alt='')
+      //-       figcaption.px-5.py-3.bg-white.shadow-sm
+      //-         h2.h5.mb-1.font-weight-bold.font-italic Image Caption
+      //-         p.mb-0.text-small.font-italic.text-muted Lorem ipsum dolor.

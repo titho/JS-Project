@@ -103,9 +103,9 @@ class SpotifyManager {
   public async getCurrentPlayback() {
     let that = this;
     return await this._spotifyApi.getMyCurrentPlaybackState().then(
-      function(data: any, err: Error) {
-        if(that.isEmptyObject(data.body)){
-            return {};
+      function(data: any) {
+        if(!Object.keys(data.body).length){
+            return "";
         }
         return {
           song_id: data.body.item.id,
@@ -123,7 +123,6 @@ class SpotifyManager {
   public async getSong(song_id: number) {
     return await this._spotifyApi.getTrack(song_id).then(
       function(data: any) {
-        console.log("Getting song...");
         // console.log(data.body);
 
         return data.body;

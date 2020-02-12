@@ -117,8 +117,13 @@ router.route("/currently").get(
     try {
       let result = await SpotifyApi.getCurrentPlayback();
       // let progress = msToHMS(result.songProgress);
-      if (!result.song_id) {
-        res.send("Nothing playing currently");
+      if (result == undefined) {
+        res.send({
+          song_id: "0h5m65o5KnMFB4Gq47mbKt",
+          uri: "spotify:track:0h5m65o5KnMFB4Gq47mbKt",
+          songProgress: 0,
+          image_url: "https://img.fruugo.com/product/6/31/82003316_max.jpg"
+        });
       }
       res.send({
         song_id: result.song_id,
@@ -128,7 +133,39 @@ router.route("/currently").get(
       });
     } catch (err) {
       console.log("Something went wrong!", err);
+      res.status(401).send();
     }
+  },
+  function(err: Error) {
+    console.log("Something went wrong!", err);
+  }
+);
+
+router.route("/getsong").get(
+  async function(req: Request, res: Response) {
+    let song_id = req.query.id;
+
+    let result = await SpotifyApi.getSong(song_id).then((data: any) => {
+      if (data != undefined) {
+        return {
+          name: data.name,
+          artist: data.artists[0].name,
+          image: data.album.images[0]
+        };
+      } else {
+        return {
+          name: "Candy Shop",
+          artist: "50 Cent",
+          image: "https://img.fruugo.com/product/6/31/82003316_max.jpg"
+        };
+      }
+    });
+    res.send({
+      name: result.name,
+      artist: result.artist,
+      image: result.image,
+      id: song_id
+    });
   },
   function(err: Error) {
     console.log("Something went wrong!", err);
@@ -158,6 +195,44 @@ router.route("/currently").get(
 //     console.log("Something went wrong!", err);
 //   }
 // }
+router.route("/browse").get(
+  async function(req: Request, res: Response) {
+    res.render("chooseRoom");
+  }
+)
+
+router.get("/browse", async (request: Request, response: Response) => {
+  
+  let getsInfoFromEndpoint = [
+    {
+      id: "123-456",
+      roomname: "Room_A",
+      song: "50 Cent - P.I.M.P",
+      owner: "vasko",
+      image_url:
+        "https://images.theconversation.com/files/258026/original/file-20190208-174861-nms2kt.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=926&fit=clip"
+    },
+    {
+      id: "123-456",
+      roomname: "Room_B",
+      song: "50 Cent - P.I.M.P",
+      owner: "vasko",
+      image_url:
+        "https://images.theconversation.com/files/258026/original/file-20190208-174861-nms2kt.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=926&fit=clip"
+    },
+    {
+      id: "123-456",
+      roomname: "Room_C",
+      song: "50 Cent - P.I.M.P",
+      owner: "vasko",
+      image_url:
+        "https://images.theconversation.com/files/258026/original/file-20190208-174861-nms2kt.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=926&fit=clip"
+    }
+  ];
+
+  response.render("chooseroom", { rooms: getsInfoFromEndpoint });
+});
+
 router.route("/player").get(
   async function(req: Request, res: Response) {
     try {
@@ -166,11 +241,19 @@ router.route("/player").get(
 
       let songinfo = await SpotifyApi.getSong(result.song_id).then(
         (data: any) => {
-          return {
-            name: data.name,
-            artist: data.artists[0].name,
-            image: data.image_url
-          };
+          if (data != undefined) {
+            return {
+              name: data.name,
+              artist: data.artists[0].name,
+              image: data.image_url
+            };
+          } else {
+            return {
+              name: "Candy Shop",
+              artist: "50 Cent",
+              image: "https://img.fruugo.com/product/6/31/82003316_max.jpg"
+            };
+          }
         }
       );
       res.render("index", {
@@ -199,7 +282,7 @@ router
     }
   });
 
-function msToHMS(millis: number) {
+export function msToHMS(millis: number) {
   var minutes = Math.floor(millis / 60000);
   var seconds = parseInt(((millis % 60000) / 1000).toFixed(0));
   return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
