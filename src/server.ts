@@ -63,34 +63,6 @@ io.on("connection", function(socket: Socket) {
 });
 
 app.use("/api", ApiController);
-// app.use(
-//   "/player",
-//   function(req: Request, res: Response) {
-//     var player = Player();
-//     res.render("index", player);
-//   },
-//   function(req: Request, res: Response) {}
-// );
-
-// socket.on("connected", function(msg: string) {
-//   io.emit(
-//     "playback",
-//     setInterval(
-//       () => async (socket: Socket) => {
-//         try {
-//           const res = await axios.get("http://localhost:3000/api/currently"); // Getting the data from DarkSky
-//           socket.emit("playback", res.data.songProgress); // Emitting a new message. It will be consumed by the client
-//         } catch (error) {
-//           console.error(`Error: ${error.code}`);
-//         }
-//       },
-//       500
-//     )
-//   );
-//   console.log(msg);
-// });
-
-// app.get("/player", async (request: Request, response: Response) => {
 
 app.post("/register", async (request: Request, response: Response) => {
   let userData = {
@@ -152,39 +124,6 @@ app.post("/saveSpotifyUser", async (request: Request, response: Response) => {
     response.send(error);
   }
 });
-
-// app.get("/loginSite", async (request: Request, response: Response) => {
-//   let userData = {
-//     Username: request.body.Username,
-//     Password: request.body.Password
-//   };
-
-//   const pool = new sql.ConnectionPool({
-//     server: "LAPTOP-6IFUU7D3",
-//     database: "SpotifyProject",
-//     options: {
-//       trustedConnection: true
-//     }
-//   });
-
-//   await pool.connect();
-
-//   const req = new sql.Request(pool);
-
-//   const query = `SELECT Password FROM [User]
-//                     WHERE ID IN
-//                     (SELECT ID FROM [User]
-//                         WHERE Username = '${userData.Username}')`;
-
-//   const result = await req.query(query);
-//   const passwordHash = require("password-hash");
-
-//   if (passwordHash.verify(userData.Password, result.recordset[0].Password)) {
-//     response.send("User successfully loged in");
-//   } else {
-//     response.send("Log in failed!");
-//   }
-// });
 
 app.get("/logout", function(req, res) {
   res.status(401).send("You are now logged out.");

@@ -195,11 +195,6 @@ router.route("/getsong").get(
 //     console.log("Something went wrong!", err);
 //   }
 // }
-router.route("/browse").get(
-  async function(req: Request, res: Response) {
-    res.render("chooseRoom");
-  }
-)
 
 router.get("/browse", async (request: Request, response: Response) => {
   
