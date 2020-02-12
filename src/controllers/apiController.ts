@@ -38,7 +38,8 @@ router.get(
 router.get("/me", async function(req: Request, res: Response) {
   try {
     let result = await SpotifyApi.GetMe();
-    res.render(result);
+    res.redirect(`http://localhost:3000/saveSpotifyUser?email=${result.email}&id=${result.id}`);
+
   } catch (err) {
     res.send(err);
   }
