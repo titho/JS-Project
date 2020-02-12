@@ -4,7 +4,7 @@ const axios = require("axios");
 var http = require("http");
 
 import { IUser } from "../models/user";
-import { IRoom } from "../models/room";
+//import { IRoom } from "../models/room";
 
 import SpotifyManager from "../services/spotifyManager";
 import { Socket } from "socket.io";
@@ -38,10 +38,211 @@ router.get(
 router.get("/me", async function(req: Request, res: Response) {
   try {
     let result = await SpotifyApi.GetMe();
-    res.redirect(`http://localhost:3000/saveSpotifyUser?email=${result.email}&id=${result.id}`);
-
+    res.redirect(
+      `http://localhost:3000/saveSpotifyUser?email=${result.email}&id=${result.id}`
+    );
   } catch (err) {
     res.send(err);
+  }
+});
+
+router.post("/createRoom", async function(
+  request: Request,
+  response: Response
+) {
+  let currentUser = await SpotifyApi.GetMe();
+  console.log("Creating room.....");
+
+  const data = {
+    Name: request.body.Name,
+    OwnerID: currentUser.id,
+    IsPlaying: false
+  };
+
+  let topTracks = await SpotifyApi.getCurrentUsersTopTracks();
+    let tracks: any = [];
+
+    topTracks.body.items.forEach((track: any) =>
+      tracks.push({
+        id: track.id,
+        artist: track.artists[0].name,
+        name: track.name
+      })
+    );
+
+
+  console.log(data);
+
+  const pool = new sql.ConnectionPool({
+    server: "LAPTOP-6IFUU7D3",
+    database: "SpotifyProject",
+    options: {
+      trustedConnection: true
+    }
+  });
+
+  await pool.connect();
+
+  try {
+    const req = new sql.Request(pool);
+
+    const query = `INSERT INTO dbo.[Room] (ID, Name, OwnerID, IsPlaying)
+                  VALUES(NEWID(), '${data.Name}', '${data.OwnerID}', '${data.IsPlaying}')`;
+    const result = await req.query(query);
+
+    const roomIdQuery = `SELECT ID FROM dbo.[Room] WHERE Name = '${data.Name}' AND OwnerID = '${data.OwnerID}'`;
+    const idResult = await req.query(roomIdQuery);
+
+    console.log(idResult.recordset[0].ID);
+
+    console.log("Room created");
+
+    tracks.forEach(async (track: any) => {
+
+      const saveSongsQuery = `INSERT INTO dbo.Song(ID, Name, Artists, FK_Ref_Room)
+                              VALUES('${track.id}', '${track.name.replace("\'", "")}', '${track.artist.replace("\'", "")}', '${idResult.recordset[0].ID}')`;
+
+      const result = await req.query(saveSongsQuery);
+    });
+
+    response.redirect(
+      `http://localhost:3000/api/roomTracks?id=${idResult.recordset[0].ID}`
+    );
+  } catch (error) {
+    response.send(error);
+  }
+});
+
+router.get("/rooms", async function(request: Request, response: Response) {
+  let currentUser = await SpotifyApi.GetMe();
+
+  const pool = new sql.ConnectionPool({
+    server: "LAPTOP-6IFUU7D3",
+    database: "SpotifyProject",
+    options: {
+      trustedConnection: true
+    }
+  });
+
+  await pool.connect();
+  try {
+    const req = new sql.Request(pool);
+
+    const query = `SELECT Room.ID, [Name], Username, LastPlayed, PlaybackMS, IsPlaying  
+                    FROM Room JOIN [User] 
+                    ON [OwnerID] = [User].SpotifyAccountID`;
+
+    const result = await req.query(query);
+    let rooms: any = [];
+
+    result.recordset.forEach((room: any) => rooms.push(room));
+
+    console.dir(rooms);
+    response.send(rooms);
+  } catch (error) {
+    response.send(error);
+  }
+});
+
+router.get("/enterRoom", async function(request: Request, response: Response) {
+  let currentUser = await SpotifyApi.GetMe();
+  console.log("Entering room.....");
+
+  let topTracks = await SpotifyApi.getCurrentUsersTopTracks();
+    let tracks: any = [];
+
+    topTracks.body.items.forEach((track: any) =>
+      tracks.push({
+        id: track.id,
+        artist: track.artists[0].name,
+        name: track.name
+      })
+    );
+
+  const pool = new sql.ConnectionPool({
+    server: "LAPTOP-6IFUU7D3",
+    database: "SpotifyProject",
+    options: {
+      trustedConnection: true
+    }
+  });
+
+  await pool.connect();
+  try {
+    const req = new sql.Request(pool);
+
+    const query = `INSERT INTO User_Room(ID, Ref_User_ID, Ref_Room_ID)
+                    VALUES(NEWID(), ${currentUser.id}, '${request.query.id}')`;
+
+    const result = await req.query(query);
+    console.log("Entered room successfully.");
+
+    tracks.forEach(async (track: any) => {
+
+      const saveSongsQuery = `INSERT INTO dbo.Song(ID, Name, Artists, FK_Ref_Room)
+                              VALUES('${track.id}', '${track.name.replace("\'", "")}', '${track.artist.replace("\'", "")}', '${request.query.id}')`;
+      const result = await req.query(saveSongsQuery);
+    });
+
+    console.dir(result);
+    response.redirect(`http://localhost:3000/api/roomTracks?id=${request.query.id}`);
+  } catch (error) {
+    console.log(error);
+    response.send("You are already in this room!");
+  }
+});
+
+router.get("/leaveRoom", async function(request: Request, response: Response) {
+  let currentUser = await SpotifyApi.GetMe();
+  console.log("Leaving room.....");
+
+  const pool = new sql.ConnectionPool({
+    server: "LAPTOP-6IFUU7D3",
+    database: "SpotifyProject",
+    options: {
+      trustedConnection: true
+    }
+  });
+
+  await pool.connect();
+  try {
+    const req = new sql.Request(pool);
+
+    const query = `DELETE FROM [User_Room] 
+                    WHERE Ref_User_ID = '${currentUser.id}' AND Ref_Room_ID = '${request.query.id}'`;
+
+    const result = await req.query(query);
+    console.log("Left room successfully.");
+    console.dir(result);
+    response.redirect("http://localhost:3000/api/rooms");
+  } catch (error) {
+    response.send(error);
+  }
+});
+
+router.get("/roomTracks", async function(request: Request, response: Response) {
+  console.log("Getting room tracks.................");
+  try {
+    const pool = new sql.ConnectionPool({
+      server: "LAPTOP-6IFUU7D3",
+      database: "SpotifyProject",
+      options: {
+        trustedConnection: true
+      }
+    });
+
+    await pool.connect();
+    const req = new sql.Request(pool);
+    console.log("connected....");
+
+    const roomTracks = `SELECT [Name], Artists FROM dbo.[Song]
+                        WHERE FK_Ref_Room = '${request.query.id}'`;
+                            
+    const result = await req.query(roomTracks);
+    response.send(result.recordset);
+  } catch (error) {
+    console.log(error);
+    response.send(error);
   }
 });
 
@@ -141,6 +342,61 @@ router.route("/currently").get(
   }
 );
 
+router.route("/shuffle").put(
+  async function(request: Request, response: Response) {
+    try {
+      let result = await SpotifyApi.shuffle();
+      response.send("Playback on shuffle");
+
+    }
+    catch(error) {
+      console.log("Something went wrong!", error);
+    }
+  } 
+);
+
+router.put("/activateRoom", async function(request: Request, response: Response) {
+  try {
+
+    const pool = new sql.ConnectionPool({
+      server: "LAPTOP-6IFUU7D3",
+      database: "SpotifyProject",
+      options: {
+        trustedConnection: true
+      }
+    });
+
+    await pool.connect();
+    const req = new sql.Request(pool);
+
+    console.log("Activating room");
+
+    const activateQuery = `UPDATE [ROOM]
+                        SET IsPlaying = 1
+                        WHERE ID = '${request.query.id}'`;
+                            
+    const resultActivated = await req.query(activateQuery);
+
+    const roomTracks = `SELECT ID FROM dbo.[Song]
+                        WHERE FK_Ref_Room = '${request.query.id}'`;
+                            
+    const resultTracksIDs = await req.query(roomTracks);
+    let tracksIDs: any = [];
+
+    resultTracksIDs.recordset.forEach((track: any) => {
+      tracksIDs.push(`spotify:track:${track.ID}`);
+    });
+
+    //console.log(tracksIDs);
+    await SpotifyApi.play(tracksIDs);
+
+    response.redirect(`http://localhost:3000/api/roomTracks?id=${request.query.id}`);
+  }
+  catch (error) {
+    console.log("Something went wrong!", error);
+  }
+
+});
 router.route("/getsong").get(
   async function(req: Request, res: Response) {
     let song_id = req.query.id;
