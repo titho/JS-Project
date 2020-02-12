@@ -128,7 +128,9 @@ router.get("/rooms", async function(request: Request, response: Response) {
   try {
     const req = new sql.Request(pool);
 
-    const query = `SELECT ID, [Name] FROM [Room]`;
+    const query = `SELECT [Name], Username, LastPlayed, PlaybackMS, IsPlaying  
+                    FROM Room JOIN [User] 
+                    ON [OwnerID] = [User].SpotifyAccountID`;
 
     const result = await req.query(query);
     let rooms: any = [];
@@ -378,6 +380,10 @@ router.put("/activateRoom", async function(request: Request, response: Response)
     resultTracksIDs.recordset.forEach((track: any) => {
       tracksIDs.push(`spotify:track:${track.ID}`);
     });
+
+    // tracksIDs.forEach((track: any) => {
+    //   track.replace("\'", "\"");
+    // });
 
     //{"uris": ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"]}
 
