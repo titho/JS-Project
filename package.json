@@ -26,6 +26,7 @@
     "pug": "^2.0.4",
     "socket.io": "^2.3.0",
     "spotify-web-api-node": "^4.0.0",
+    "typedi": "^0.8.0",
     "uuid": "^3.4.0"
   },
   "devDependencies": {

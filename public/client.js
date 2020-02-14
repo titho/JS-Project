@@ -2,7 +2,7 @@ $(function() {
   
     $('#login').click(function() {
       // Call the authorize endpoint, which will return an authorize URL, then redirect to that URL
-      $.get('/api/login', function(data) {
+      $.get('/user/login', function(data) {
         console.log("callback url: " + data)
         window.location.replace(data);
       });
