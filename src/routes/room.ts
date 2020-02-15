@@ -9,14 +9,14 @@ var router = express.Router();
 //     and is basically the room you are in right now.
 // router.get("/", RoomControler.get_room)
 // Get all rooms
-router.get("/browse", RoomControler.browseRooms)
+router.get("/browse", RoomControler.getAllRooms)
 // Get tracks for room
 router.get("/tracks", RoomControler.getRoomTracks)
 router.post("/create", RoomControler.createRoom)
 // Enter room
 router.post("/join", RoomControler.joinRoom)
 router.post("/leave", RoomControler.leaveRoom)
-router.post("/activate", RoomControler.activateRoom)
+router.put("/activate", RoomControler.activateRoom)
 
 // Player controls
 // router.post("/pause", RoomControler.pause)
