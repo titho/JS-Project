@@ -1,399 +1,230 @@
-import { Router, Request, Response, request, response } from "express";
-import { Container } from "typedi";
-
-import UserService from "../services/userService";
+import { Service, Container } from "typedi";
+import SpotifyService from "./spotifyService";
 
 require("dotenv").config();
 
-// Dependency injection for the user service
-const _userService = Container.get(UserService);
+const { poolPromise } = require("../db/db");
+const sql = require("mssql/msnodesqlv8");
 
-export async function login(req: Request, res: Response) {
-  var authenticationUrl = await _userService.login();
+@Service()
+export default class UserService {
+  private _spotifyService: any;
 
-  res.send(authenticationUrl + "&show_dialog=true");
-}
+  constructor() {
+    this._spotifyService = Container.get(SpotifyService);
+  }
+  public async login() {
+    var authenticationUrl = await this._spotifyService.login();
+    return authenticationUrl;
+  }
 
-export async function callback(req: Request, res: Response) {
-  try {
-    console.log("\x1b[33m", "Router" + "\x1b[37m", "callback endpoint called");
-    var authorizationCode = req.query.code;
+  public async callback(authorizationCode: string) {
+    try {
+      console.log(
+        "\x1b[33m",
+        "Router" + "\x1b[37m",
+        "callback endpoint called"
+      );
 
-    await _userService.callback(authorizationCode);
-    res.redirect(`${process.env.HOST_URL}/rooms/browse`);
-  } catch (err) {
-    throw err;
+      await this._spotifyService.callback(authorizationCode);
+      return Promise.resolve();
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  public async register(userData: any) {
+    const pool = await poolPromise;
+
+    // await pool.connect((err: Error) => {
+    //   console.log("Error connection to db...");
+    // });
+
+    try {
+      const req = new sql.Request(pool);
+      const passwordHash = require("password-hash");
+      const hashedPassword = passwordHash.generate(userData.Password);
+      const query = `INSERT INTO dbo.[User] (ID, Email, Username, Password)
+                  VALUES(NEWID(), '${userData.Email}', '${userData.Username}', '${hashedPassword}')`;
+
+      const result = await req.query(query);
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject();
+    }
+  }
+
+  public async saveSpotifyUser(id: string, email: string) {
+    const pool = await poolPromise;
+
+    // await pool.connect();
+
+    const req = new sql.Request(pool);
+
+    try {
+      const query = `UPDATE [User]
+                SET SpotifyAccountID = '${id}'
+                WHERE Email = '${email}'`;
+
+      await req.query(query);
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  public async getMe() {
+    try {
+      let result = await this._spotifyService.GetMe();
+      return Promise.resolve(result);
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
+  public async pause() {
+    try {
+      console.log("\x1b[35m", "Pause called");
+      let result = await this._spotifyService.setPlayback("Pause");
+      console.log(result);
+
+      return Promise.resolve(result);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  public async playNext() {
+    try {
+      let result = await this._spotifyService.nextSong();
+      console.log(result);
+
+      return Promise.resolve(result);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+  public async playPrev() {
+    try {
+      let result = await this._spotifyService.prevSong();
+      console.log(result);
+
+      return Promise.resolve(result);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  public async play() {
+    try {
+      // console.log("\x1b[35m", "Play called");
+      let result = await this._spotifyService.setPlayback("Play");
+      console.log(result);
+
+      return Promise.resolve(result);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  public async playTrack(uri: string, ms: any) {
+    try {
+      console.log("\x1b[35m", "Seek called");
+      let result = await this._spotifyService.setPlayback("Seek", ms, uri);
+      console.log(result);
+
+      return Promise.resolve(result);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  // Try to make it to check if user is active, if not, get last played song
+  public async getCurrentlyPlaying() {
+    try {
+      let result = await this._spotifyService.getCurrentPlayback();
+      // let progress = msToHMS(result.songProgress);
+      if (result == undefined) {
+        return Promise.resolve({
+          song_id: "0h5m65o5KnMFB4Gq47mbKt",
+          uri: "spotify:track:0h5m65o5KnMFB4Gq47mbKt",
+          songProgress: 0,
+          image_url: "https://img.fruugo.com/product/6/31/82003316_max.jpg"
+        });
+      }
+      return Promise.resolve({
+        song_id: result.song_id,
+        uri: result.uri,
+        songProgress: result.songProgress,
+        image_url: result.image_url
+      });
+    } catch (err) {
+      console.log("Something went wrong!", err);
+      return Promise.reject(err);
+    }
+  }
+
+  //   public async shuffle(request: Request, response: Response) {
+  //     try {
+  //       let result = await this._spotifyService.shuffle();
+  //       response.send("Playback on shuffle");
+  //     } catch (error) {
+  //       console.log("Something went wrong!", error);
+  //     }
+  //   }
+
+  public async getSong(songId: any) {
+    return await this._spotifyService.getSong(songId).then((data: any) => {
+      return Promise.resolve({
+        name: data.name,
+        artist: data.artist,
+        image: data.image,
+        id: songId
+      });
+    });
+  }
+
+  public async getPlayer() {
+    try {
+      let result = await this._spotifyService.getCurrentPlayback();
+      let progress = this.msToHMS(result.songProgress);
+
+      let songinfo = await this._spotifyService
+        .getSong(result.song_id)
+        .then((data: any) => {
+          if (data != undefined) {
+            return {
+              name: data.name,
+              artist: data.artists[0].name,
+              image: data.image_url
+            };
+          } else {
+            return {
+              name: "Candy Shop",
+              artist: "50 Cent",
+              image: "https://img.fruugo.com/product/6/31/82003316_max.jpg"
+            };
+          }
+        });
+      return Promise.resolve({
+        artist: songinfo.artist,
+        songName: songinfo.name,
+        time_ms: progress
+      });
+    } catch (err) {
+      console.log("Something went wrong!", err);
+      return Promise.reject(err);
+    }
+  }
+
+  public async msToHMS(millis: number) {
+    var minutes = Math.floor(millis / 60000);
+    var seconds = parseInt(((millis % 60000) / 1000).toFixed(0));
+    return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
   }
 }
-
-export async function register(request: Request, response: Response) {
-  try {
-    let userData = {
-      Email: request.body.Email,
-      Username: request.body.Username,
-      Password: request.body.Password,
-      RepeatedPassword: request.body.RepeatedPassword
-    };
-
-    await _userService.register(userData);
-
-    response.redirect(`${process.env.HOST_URL}/user/login`);
-  } catch (error) {
-    response.send(error);
-  }
-}
-
-export async function saveSpotifyUser(request: Request, response: Response) {
-  try {
-    let id = request.query.id;
-    let email = request.query.email;
-
-    await _userService.saveSpotifyUser(id, email);
-
-    response.redirect(`${process.env.HOST_URL}/rooms`);
-  } catch (error) {
-    response.send(error);
-  }
-}
-
-export async function getMe(req: Request, res: Response) {
-  try {
-    let result = await _userService.getMe();
-    res.redirect(
-      `${process.env.HOST_URL}/user/save-spotify-user?email=${result.email}&id=${result.id}`
-    );
-  } catch (err) {
-    res.send(err);
-  }
-}
-
-export async function pause(req: Request, res: Response) {
-  let result = await _userService.pause();
-  console.log(result);
-  res.send(result);
-}
-
-export async function play_next(req: Request, res: Response) {
-  try {
-    let result = await _userService.playNext();
-    console.log(result);
-    res.send(result);
-  } catch (err) {
-    console.log("Something went wrong!", err);
-  }
-}
-export async function play_prev(req: Request, res: Response) {
-  try {
-    let result = await _userService.playPrev();
-    console.log(result);
-    res.send(result);
-  } catch (err) {
-    console.log("Something went wrong!", err);
-  }
-}
-
-export async function play(req: Request, res: Response) {
-  try {
-    // console.log("\x1b[35m", "Play called");
-    let result = await _userService.play();
-
-    res.send(result);
-  } catch (err) {
-    console.log("Cannot resume song!", err);
-  }
-}
-
-export async function playTrack(req: Request, res: Response) {
-  try {
-    const uri = req.query.uri;
-    const ms = req.query.ms;
-    
-    let result = await _userService.playTrack(ms, uri);
-    res.send(result);
-  } catch (err) {
-    console.log("Cannot play song!", err);
-  }
-}
-
-// Try to make it to check if user is active, if not, get last played song
-export async function getCurrentlyPlaying(req: Request, res: Response) {
-  try {
-    let result = await _userService.getCurrentlyPlaying();
-    
-    res.send(result);
-  } catch (err) {
-    console.log("Something went wrong!", err);
-    res.status(401).send();
-  }
-}
-
-// export async function shuffle(request: Request, response: Response) {
-//   try {
-//     let result = await SpotifyApi.shuffle();
-//     response.send("Playback on shuffle");
-//   } catch (error) {
-//     console.log("Something went wrong!", error);
-//   }
-// }
-
-export async function getSong(req: Request, res: Response) {
-  let song_id = req.query.id;
-  let result = await _userService.getSong(song_id);
-
-  res.send(result);
-}
-
-export async function getPlayer(req: Request, res: Response) {
-  try {
-    let result = await _userService.getPlayer();
-    res.render("index", result);
-  } catch (err) {
-    console.log("Something went wrong!", err);
-  }
-}
-
-export function msToHMS(millis: number) {
-  var minutes = Math.floor(millis / 60000);
-  var seconds = parseInt(((millis % 60000) / 1000).toFixed(0));
-  return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-}
-// import { Router, Request, Response, request, response } from "express";
-// import { Container } from 'typedi';
-// import SpotifyService from "../services/spotifyManager";
-// const { poolPromise } = require('../db/db')
-// require("dotenv").config();
-// const sql = require("mssql/msnodesqlv8");
-
-// // const axios = require("axios");
-// // var http = require("http");
-
-// // import SpotifyService from "../services/spotifyManager";
-// // const SpotifyApi = new SpotifyService();
-// const SpotifyApi = Container.get(SpotifyService);
-
-// // const dbconfig = {
-// //   server: process.env.SQL_SERVER,
-// //   database: process.env.SQL_DATABASE,
-// //   options: {
-// //     trustedConnection: true
-// //   }
-// // };
-
-// // const pool = new sql.ConnectionPool(dbconfig);
-
-// export async function login(req: Request, res: Response) {
-//   var authenticationUrl = await SpotifyApi.login();
-//   res.send(authenticationUrl + "&show_dialog=true");
-// }
-
-// export async function callback(req: Request, res: Response) {
-//   try {
-//     console.log("\x1b[33m", "Router" + "\x1b[37m", "callback endpoint called");
-//     var authorizationCode = req.query.code;
-
-//     await SpotifyApi.callback(authorizationCode);
-//     res.redirect(`${process.env.HOST_URL}/rooms/browse`);
-//   } catch (err) {
-//     throw err;
-//   }
-// }
-
-// export async function register(request: Request, response: Response) {
-//   let userData = {
-//     Email: request.body.Email,
-//     Username: request.body.Username,
-//     Password: request.body.Password,
-//     RepeatedPassword: request.body.RepeatedPassword
-//   };
-
-//   const pool = await poolPromise;
-
-//   // await pool.connect((err: Error) => {
-//   //   console.log("Error connection to db...");
-//   // });
-
-//   try {
-//     const req = new sql.Request(pool);
-//     const passwordHash = require("password-hash");
-//     const hashedPassword = passwordHash.generate(userData.Password);
-//     const query = `INSERT INTO dbo.[User] (ID, Email, Username, Password)
-//                   VALUES(NEWID(), '${userData.Email}', '${userData.Username}', '${hashedPassword}')`;
-
-//     const result = await req.query(query);
-
-//     console.dir(result);
-//     response.redirect(`${process.env.HOST_URL}/user/login`);
-//   } catch (error) {
-//     response.send(error);
-//   }
-// }
-
-// export async function save_spotify_user(request: Request, response: Response) {
-
-//   const pool = await poolPromise;
-
-//   // await pool.connect();
-
-//   const req = new sql.Request(pool);
-
-//   try {
-//     const query = `UPDATE [User]
-//                 SET SpotifyAccountID = '${request.query.id}'
-//                 WHERE Email = '${request.query.email}'`;
-
-//     const result = await req.query(query);
-//     console.dir(result);
-
-//     response.redirect(`${process.env.HOST_URL}/rooms`);
-//   } catch (error) {
-//     response.send(error);
-//   }
-// }
-
-// export async function getMe(req: Request, res: Response) {
-//   try {
-//     let result = await SpotifyApi.GetMe();
-//     res.redirect(
-//       `${process.env.HOST_URL}/user/save-spotify-user?email=${result.email}&id=${result.id}`
-//     );
-//   } catch (err) {
-//     res.send(err);
-//   }
-// }
-
-// export async function pause(req: Request, res: Response) {
-//   console.log("\x1b[35m", "Pause called");
-//   let result = await SpotifyApi.setPlayback("Pause");
-//   console.log(result);
-//   res.send(result);
-// }
-
-// export async function play_next(req: Request, res: Response) {
-//   try {
-//     let result = await SpotifyApi.nextSong();
-//     console.log(result);
-//     res.send(result);
-//   } catch (err) {
-//     console.log("Something went wrong!", err);
-//   }
-// }
-// export async function play_prev(req: Request, res: Response) {
-//   try {
-//     let result = await SpotifyApi.prevSong();
-//     console.log(result);
-//     res.send(result);
-//   } catch (err) {
-//     console.log("Something went wrong!", err);
-//   }
-// }
-
-// export async function play(req: Request, res: Response) {
-//   try {
-//     // console.log("\x1b[35m", "Play called");
-//     let result = await SpotifyApi.setPlayback("Play");
-
-//     res.send(result);
-//   } catch (err) {
-//     console.log("Cannot resume song!", err);
-//   }
-// }
-
-// export async function play_track(req: Request, res: Response) {
-//   try {
-//     const uri = req.query.uri;
-//     const ms = req.query.ms;
-//     console.log("\x1b[35m", "Seek called");
-//     let result = await SpotifyApi.setPlayback("Seek", ms, uri);
-//     res.send(result);
-//   } catch (err) {
-//     console.log("Cannot play song!", err);
-//   }
-// }
-
-// // Try to make it to check if user is active, if not, get last played song
-// export async function get_currently_playing(req: Request, res: Response) {
-//   try {
-//     let result = await SpotifyApi.getCurrentPlayback();
-//     // let progress = msToHMS(result.songProgress);
-//     if (result == undefined) {
-//       res.send({
-//         song_id: "0h5m65o5KnMFB4Gq47mbKt",
-//         uri: "spotify:track:0h5m65o5KnMFB4Gq47mbKt",
-//         songProgress: 0,
-//         image_url: "https://img.fruugo.com/product/6/31/82003316_max.jpg"
-//       });
-//     }
-//     res.send({
-//       song_id: result.song_id,
-//       uri: result.uri,
-//       songProgress: result.songProgress,
-//       image_url: result.image_url
-//     });
-//   } catch (err) {
-//     console.log("Something went wrong!", err);
-//     res.status(401).send();
-//   }
-// }
-
-// export async function shuffle(request: Request, response: Response) {
-//   try {
-//     let result = await SpotifyApi.shuffle();
-//     response.send("Playback on shuffle");
-//   } catch (error) {
-//     console.log("Something went wrong!", error);
-//   }
-// }
-
-// export async function get_song(req: Request, res: Response) {
-//   let song_id = req.query.id;
-
-//   return await SpotifyApi.getSong(song_id).then((data: any) => {
-//     res.send({
-//       name: data.name,
-//       artist: data.artist,
-//       image: data.image,
-//       id: song_id
-//     });
-//   });
-// }
-
-// export async function getPlayer(req: Request, res: Response) {
-//   try {
-//     let result = await SpotifyApi.getCurrentPlayback();
-//     let progress = msToHMS(result.songProgress);
-
-//     let songinfo = await SpotifyApi.getSong(result.song_id).then(
-//       (data: any) => {
-//         if (data != undefined) {
-//           return {
-//             name: data.name,
-//             artist: data.artists[0].name,
-//             image: data.image_url
-//           };
-//         } else {
-//           return {
-//             name: "Candy Shop",
-//             artist: "50 Cent",
-//             image: "https://img.fruugo.com/product/6/31/82003316_max.jpg"
-//           };
-//         }
-//       }
-//     );
-//     res.render("index", {
-//       artist: songinfo.artist,
-//       songName: songinfo.name,
-//       time_ms: progress
-//     });
-//   } catch (err) {
-//     console.log("Something went wrong!", err);
-//   }
-// }
-
-// export function msToHMS(millis: number) {
-//   var minutes = Math.floor(millis / 60000);
-//   var seconds = parseInt(((millis % 60000) / 1000).toFixed(0));
-//   return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
-// }
 
 // router.get("/me", async function(req: Request, res: Response) {
 //   try {
