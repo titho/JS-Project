@@ -1,0 +1,251 @@
+doctype html
+head
+  meta(charset='utf-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+  meta(http-equiv='x-ua-compatible' content='ie=edge')
+  link(rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" type='text/css')
+  link(href='https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i' rel='stylesheet')
+  link(href='https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.12.0/css/mdb.min.css' rel='stylesheet')
+  link(rel='stylesheet' href='https://use.fontawesome.com/releases/v5.8.2/css/all.css')
+  link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap')
+  link(rel='stylesheet' href='https://use.fontawesome.com/releases/v5.11.2/css/all.css')
+  link(href='index.css' rel='stylesheet')
+  title Index
+  style(type='text/css').
+    @media (min-width: 800px) and (max-width: 850px) {
+    .navbar:not(.top-nav-collapse) {
+    background: #1C2331 !important;
+    }
+    }
+// Navbar
+nav.navbar.fixed-top.navbar-expand-lg.navbar-dark.scrolling-navbar
+  .container
+    // Brand
+    a.navbar-brand(href='#' target='_blank')
+      strong MDB
+    // Collapse
+    button.navbar-toggler(type='button' data-toggle='collapse' data-target='#navbarSupportedContent' aria-controls='navbarSupportedContent' aria-expanded='false' aria-label='Toggle navigation')
+      span.navbar-toggler-icon
+    // Links
+    #navbarSupportedContent.collapse.navbar-collapse
+      // Left
+      ul.navbar-nav.mr-auto
+        li.nav-item.active
+          a.nav-link(href='#')
+            | Home
+            span.sr-only (current)
+        li.nav-item
+          a.nav-link(target='_blank' data-toggle="modal" data-target="#modalLoginForm") Login
+        li.nav-item
+          a.nav-link(target='_blank' data-toggle="modal" data-target="#modalRegisterForm") Register
+      // Right
+      ul.navbar-nav.nav-flex-icons
+        li.nav-item
+          a.nav-link.border.border-light.rounded(href='https://github.com/titho/JS-Project' target='_blank')
+            i.fab.fa-github.mr-2
+            | GitHub
+// Navbar
+// Carousel Wrapper
+#carousel-example-1z.carousel.slide.carousel-fade(data-ride='carousel')
+  // Indicators
+  ol.carousel-indicators
+    li.active(data-target='#carousel-example-1z' data-slide-to='0')
+    li(data-target='#carousel-example-1z' data-slide-to='1')
+    li(data-target='#carousel-example-1z' data-slide-to='2')
+  // /.Indicators
+  // Slides
+  .carousel-inner(role='listbox')
+    // First slide
+    .carousel-item.active
+      .view(style="background-image: url('img/img1.jpg'); background-repeat: no-repeat; background-size: cover;")
+        // Mask & flexbox options
+        .mask.rgba-black-light.d-flex.justify-content-center.align-items-center
+          // Content
+          .text-center.white-text.mx-5.wow.fadeIn
+            h1.mb-4
+              strong Join our Unnamed JS Project!
+            p.mb-4.d-none.d-md-block
+              strong
+                | Listen together with your friends whereever you are.
+            a.btn.btn-outline-white.btn-lg(target='_blank' href='#')
+              | Browse our rooms
+              i.fas.fa-sign-in-alt.ml-3
+    .carousel-item
+      .view(style="background-image:  url('img/img2.jpg'); background-repeat: no-repeat; background-size: cover;")
+        .mask.rgba-black-light.d-flex.justify-content-center.align-items-center
+          // Content
+          .text-center.white-text.mx-5.wow.fadeIn
+            h1.mb-4
+              strong Join our Unnamed JS Project!
+            p.mb-4.d-none.d-md-block
+              strong
+                | Listen together with your friends whereever you are.
+            a.btn.btn-outline-white.btn-lg(target='_blank' href='#')
+              | Browse our rooms
+              i.fas.fa-sign-in-alt.ml-3
+    .carousel-item
+      .view(style="background-image: url('img/img3.jpg'); background-repeat: no-repeat; background-size: cover;")
+        .mask.rgba-black-light.d-flex.justify-content-center.align-items-center
+          // Content
+          .text-center.white-text.mx-5.wow.fadeIn
+            h1.mb-4
+              strong Join our Unnamed JS Project!
+            p.mb-4.d-none.d-md-block
+              strong
+                | Listen together with your friends whereever you are.
+            a.btn.btn-outline-white.btn-lg(target='_blank' href='#')
+              | Browse our rooms
+              i.fas.fa-sign-in-alt.ml-3
+  a.carousel-control-prev(href='#carousel-example-1z' role='button' data-slide='prev')
+    span.carousel-control-prev-icon(aria-hidden='true')
+    span.sr-only Previous
+  a.carousel-control-next(href='#carousel-example-1z' role='button' data-slide='next')
+    span.carousel-control-next-icon(aria-hidden='true')
+    span.sr-only Next
+// Main layout
+main
+  .container
+    // Section: Main info
+    section.mt-5.wow.fadeIn
+      // Grid row
+      .row
+        // Grid column
+        .col-md-6.mb-4
+          img.img-fluid.z-depth-1-half(src='img/spotify.jpg' alt='')
+        // Grid column
+        // Grid column
+        .col-md-6.mb-4
+          // Main heading
+          h3.h3.mb-3 JS Project to finish FMI
+          p Fill 'em with the venom and eliminate 'em
+          p Other words, I Minute Maid 'em
+          p I don't want to hurt 'em, but I did 'em in a fit of rage
+          p I'm murderin' again, nobody will evade him
+    hr.my-5
+    // Section: Not enough
+    section
+      h2.my-5.h3.text-center What does our app do?
+      // First row
+      .row.features-small.mb-5.mt-3.wow.fadeIn
+        // First column
+        .col-md-4
+          .row
+            .col-2
+              i.fas.fa-check-circle.fa-2x.indigo-text
+            .col-10
+              h6.feature-title Its very free
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф. 
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф.
+              div(style='height:15px')
+          .row
+            .col-2
+              i.fas.fa-check-circle.fa-2x.indigo-text
+            .col-10
+              h6.feature-title Its very free
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф. 
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф.
+              div(style='height:15px')
+          .row
+            .col-2
+              i.fas.fa-check-circle.fa-2x.indigo-text
+            .col-10
+              h6.feature-title Its very free
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф. 
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф.
+              div(style='height:15px')
+        // Second column
+        .col-md-4.flex-center
+          img.z-depth-0.img-fluid(src='img/dj.jpg' alt='MDB Magazine Template displayed on iPhone')
+        .col-md-4
+          .row
+            .col-2
+              i.fas.fa-check-circle.fa-2x.indigo-text
+            .col-10
+              h6.feature-title Its very free
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф. 
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф.
+              div(style='height:15px')
+          .row
+            .col-2
+              i.fas.fa-check-circle.fa-2x.indigo-text
+            .col-10
+              h6.feature-title Its very free
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф. 
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф.
+              div(style='height:15px')
+          .row
+            .col-2
+              i.fas.fa-check-circle.fa-2x.indigo-text
+            .col-10
+              h6.feature-title Its very free
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф. 
+              p.grey-text
+                | Ох, баня, ох, кеф. Селската бaня-голям кеф.
+              div(style='height:15px')
+#modalRegisterForm.modal.fade(tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header.text-center
+            h4.modal-title.w-100.font-weight-bold Sign up
+            button.close(type='button' data-dismiss='modal' aria-label='Close')
+                span(aria-hidden='true') &times;
+        .modal-body.mx-3
+          .md-form.mb-5
+            i.fas.fa-user.prefix.grey-text
+            input#username-name.form-control.validate(type='text')
+            label(data-error='Invalid input' for='username') Username
+          .md-form.mb-5
+            i.fas.fa-envelope.prefix.grey-text
+            input#email.form-control.validate(type='email')
+            label(data-error='Invalid input' for='email') Email
+          .md-form.mb-4
+            i.fas.fa-lock.prefix.grey-text
+            input#password.form-control.validate(type='password')
+            label(data-error='Invalid input' for='password') Password
+          .md-form.mb-4
+            i.fas.fa-lock.prefix.grey-text
+            input#reppassword.form-control.validate(type='password')
+            label(data-error='Invalid input' for='reppassword') Repeat password
+        .modal-footer.d-flex.justify-content-center
+          button.btn.btn-deep-orange Register
+          .text-center
+#modalLoginForm.modal.fade(tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header.text-center
+          h4.modal-title.w-100.font-weight-bold Sign in
+          button.close(type='button' data-dismiss='modal' aria-label='Close')
+            span(aria-hidden='true') &times;
+        .modal-body.mx-3
+          .md-form.mb-5
+            i.fas.fa-user.prefix.grey-text
+            input#username.form-control.validate(type='text')
+            label(data-error='Invalid input' data-success='right' for='username') Username
+          .md-form.mb-4
+            i.fas.fa-lock.prefix.grey-text
+            input#password.form-control.validate(type='password')
+            label(data-error='Invalid input' data-success='right' for='password') Password
+        .modal-footer.d-flex.justify-content-center
+          button.btn.btn-default Login
+footer.page-footer.text-center.font-small.mt-4.wow.fadeIn
+  .footer-copyright.py-3
+    | &copy; 2020 Гъзарске фуутър
+script(src='https://code.jquery.com/jquery-1.11.1.js')
+script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js')
+script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js')
+script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.12.0/js/mdb.min.js')
+script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js')
+script(type='text/javascript').
+  // Animations initialization
+  new WOW().init();

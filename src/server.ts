@@ -1,18 +1,18 @@
 import bodyParser from "body-parser";
-import express from "express";
+import express, { Response, Request } from "express";
 import path from "path";
 import { Socket } from "socket.io";
 
-import { msToHMS } from "./controllers/userController"
+import { msToHMS } from "./controllers/userController";
+import { render } from "pug";
 
 require("dotenv").config();
 
-const room_router  = require("./routes/room");
-const user_router  = require("./routes/user");
+const room_router = require("./routes/room");
+const user_router = require("./routes/user");
 
 const socketIO = require("socket.io");
 const axios = require("axios");
-
 
 const app: express.Application = express();
 const port: number = +(process.env.PORT || 3000);
@@ -36,7 +36,9 @@ var server = app.listen(port, () => {
 
 app.use("/rooms", room_router);
 app.use("/user", user_router);
-
+app.get("/", (req: Request, res: Response) => {
+  res.render("home");
+});
 const io = socketIO(server);
 
 // TODO
@@ -69,8 +71,6 @@ io.on("connection", function(socket: Socket) {
     console.log("user disconnected");
   });
 });
-
-
 
 // app.post("/register", async (request: Request, response: Response) => {
 //   let userData = {
@@ -105,10 +105,6 @@ io.on("connection", function(socket: Socket) {
 //     response.send(error);
 //   }
 // });
-
-
-
-
 
 // app.get("/saveSpotifyUser", async (request: Request, response: Response) => {
 //   const pool = new sql.ConnectionPool({
