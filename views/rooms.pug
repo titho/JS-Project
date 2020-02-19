@@ -1,0 +1,122 @@
+doctype html
+head
+doctype html
+head
+  meta(charset='utf-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+  meta(http-equiv='x-ua-compatible' content='ie=edge')
+  link(rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css' integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" type='text/css')
+  link(href='https://fonts.googleapis.com/css?family=Poppins:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i' rel='stylesheet')
+  link(href='https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.12.0/css/mdb.min.css' rel='stylesheet')
+  link(rel='stylesheet' href='https://use.fontawesome.com/releases/v5.8.2/css/all.css')
+  link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap')
+  link(rel='stylesheet' href='https://use.fontawesome.com/releases/v5.11.2/css/all.css')
+  script(type="text/javascript" src='https://code.jquery.com/jquery-1.11.1.js')
+  link(href='index.css' rel='stylesheet')
+  title Rooms
+header
+  // Navbar
+  nav.navbar.fixed-top.navbar-expand-lg.navbar-dark.bg-dark.scrolling-navbar
+    .container
+      // Brand
+      a.navbar-brand.waves-effect(href='https://mdbootstrap.com/docs/jquery/' target='_blank')
+        strong.blue-text YOLO
+      // Collapse
+      button.navbar-toggler(type='button' data-toggle='collapse' data-target='#navbarSupportedContent' aria-controls='navbarSupportedContent' aria-expanded='false' aria-label='Toggle navigation')
+        span.navbar-toggler-icon
+      // Links
+      #navbarSupportedContent.collapse.navbar-collapse
+        ul.navbar-nav.mr-auto
+          li.nav-item.active
+            a.nav-link(href='#')
+              | Home
+              span.sr-only (current)
+          li.nav-item
+            a.nav-link(target='_blank' data-toggle="modal" data-target="#modalLoginForm") Login
+          li.nav-item
+            a.nav-link(target='_blank' data-toggle="modal" data-target="#modalRegisterForm") Register
+        // Right
+        ul.navbar-nav.nav-flex-icons
+          li.nav-item
+            a.nav-link.border.border-light.rounded(href='https://github.com/titho/JS-Project' target='_blank')
+              i.fab.fa-github.mr-2
+              | GitHub
+  // Navbar
+// Main Navigation
+// Main layout
+main.mt-5.pt-5(style="background: rgb(240,231,236);background: linear-gradient(0deg, rgba(240,231,236,1) 0%, rgba(164,118,244,0.8155637254901961) 50%, rgba(87,5,251,0.5970763305322129) 100%);")
+  .container
+    // Section: Jumbotron
+    section.card.wow.fadeIn(style='background-image: url(img/browse.jpeg); filter: blur(0.8); background-size:cover;')
+      // Content
+      .card-body.text-white.text-center.py-5.px-5.my-5
+        h1.mb-4(style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;")
+          strong Choose a room! 
+        p(style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;")
+          strong КАТО ВОЛНА ПЕПЕРУДААА
+        p.mb-4
+      // Content
+    // Section: Jumbotron
+    hr.my-5
+    // Section: Cards
+    section.text-center
+        .row.mb-4.wow.fadeIn
+            each room in asd
+                    .col-lg-4.col-md-6.mb-4
+                        // Card
+                        .card
+                          // Card image
+                          .view.overlay
+                            img.card-img-top(src='https://mdbootstrap.com/img/Marketing/mdb-press-pack/mdb-react.jpg' alt='')
+                            a(href='https://mdbootstrap.com/react/' target='_blank')
+                              .mask.rgba-white-slight
+                          // Card content
+                          .card-body
+                            // Title
+                            h4.card-title MDB with React
+                            // Text
+                            p.card-text Based on the latest Bootstrap 4 and React 16. 
+                            a.btn.btn-primary.btn-md(href='https://mdbootstrap.com/react/' target='_blank')
+                              | Free download
+                              i.fas.fa-download.ml-2
+        // Pagination
+        nav.d-flex.justify-content-center.wow.fadeIn
+          ul.pagination.pg-blue
+            // Arrow left
+            li.page-item.disabled
+              a.page-link(href='#' aria-label='Previous')
+                span(aria-hidden='true') &laquo;
+                span.sr-only Previous
+            li.page-item.active
+              a.page-link(href='#')
+                | 1
+                span.sr-only (current)
+            li.page-item
+              a.page-link(href='#') 2
+            li.page-item
+              a.page-link(href='#') 3
+            li.page-item
+              a.page-link(href='#') 4
+            li.page-item
+              a.page-link(href='#') 5
+            li.page-item
+              a.page-link(href='#' aria-label='Next')
+                span(aria-hidden='true') &raquo;
+                span.sr-only Next
+script.
+    function group(arr) {
+        return arr.reduce(function (out, cur, i) {
+            var row = i / 3 | 0
+            if (!out[row]) out[row] = [cur]
+            else           out[row].push(cur)
+            return out
+        }, []);
+    }
+script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js')
+script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js')
+script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.12.0/js/mdb.min.js')
+script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js')
+// Initializations
+script(type='text/javascript').
+  // Animations initialization
+  new WOW().init();

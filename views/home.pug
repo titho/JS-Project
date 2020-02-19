@@ -68,7 +68,7 @@ nav.navbar.fixed-top.navbar-expand-lg.navbar-dark.scrolling-navbar
             p.mb-4.d-none.d-md-block
               strong
                 | Listen together with your friends whereever you are.
-            a.btn.btn-outline-white.btn-lg(target='_blank' href='#')
+            a#browse.btn.btn-outline-white.btn-lg(target='_blank' href='#' onclick="window.location='http://localhost:3000/allrooms'")
               | Browse our rooms
               i.fas.fa-sign-in-alt.ml-3
     .carousel-item
@@ -162,7 +162,7 @@ main
               div(style='height:15px')
         // Second column
         .col-md-4.flex-center
-          img.z-depth-0.img-fluid(src='img/dj.jpg' alt='MDB Magazine Template displayed on iPhone')
+          img.z-depth-0.img-fluid(src='img/dj.jpg')
         .col-md-4
           .row
             .col-2
