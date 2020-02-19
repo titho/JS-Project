@@ -41,7 +41,7 @@ export async function joinRoom(req: Request, res: Response) {
     res.redirect(`${process.env.HOST_URL}/rooms/tracks?id=${req.query.id}`);
   } catch (error) {
     console.log(error);
-    res.send("You are already in this room!");
+    res.send(error);
   }
 }
 
