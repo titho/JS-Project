@@ -9,7 +9,12 @@ require("dotenv").config();
 const _userService = Container.get(UserService);
 
 export async function login(req: Request, res: Response) {
-  var authenticationUrl = await _userService.login();
+  const userData = {
+    Username: req.body.Username,
+    Password: req.body.Password
+  };
+
+  const authenticationUrl = await _userService.login(userData);
 
   res.send(authenticationUrl + "&show_dialog=true");
 }
@@ -36,7 +41,7 @@ export async function register(request: Request, response: Response) {
     };
 
     await _userService.register(userData);
-
+    
     response.redirect(`${process.env.HOST_URL}/user/login`);
   } catch (error) {
     response.send(error);

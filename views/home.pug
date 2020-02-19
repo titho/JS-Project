@@ -224,17 +224,21 @@ main
             $(function(){
                 $('#register').click(function(e){
                     e.preventDefault();
-                    var $inputs = $('#modalRegisterForm :input');
-                    var username = $inputs[1].value;
-                    var email = $inputs[2].value;
-                    var pass = $inputs[3].value;
-                    var reppass = $inputs[4].value;
+                    const $inputs = $('#modalRegisterForm :input');
+                    const username = $inputs[1].value;
+                    const email = $inputs[2].value;
+                    const pass = $inputs[3].value;
+                    const reppass = $inputs[4].value;
+
                     $.ajax({
                         url: 'http://localhost:3000/user/register', //this is the submit URL
                         type: 'POST', //or POST
-                        data: `username=${username}&email=${email}&password=${pass}&reppassword=${reppass}`,
+                        data: `Username=${username}&Email=${email}&Password=${pass}&RepeatPassword=${reppass}`,
                         success: function(data){
-                             alert('Success')
+                             alert('Success')                     
+                        },
+                        error: function(error) {
+                            alert('Could not register', error);
                         }
                     });
                 });
@@ -269,10 +273,14 @@ main
                     $.ajax({
                         url: 'http://localhost:3000/user/login', //this is the submit URL
                         type: 'POST', //or POST
-                        data: `username=${username}&password=${password}`,
+                        data: `Username=${username}&Password=${password}`,
                         success: function(data){
-                             alert('Success')
-                        }
+                          console.log(data);
+                          window.location.href = data;
+                        },
+                        error: function(error) {
+                          alert('Failed to login.', error);
+                        } 
                     });
                 });
             });
