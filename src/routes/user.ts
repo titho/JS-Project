@@ -9,11 +9,18 @@ var router = express.Router();
 router.get("/login", UserController.login)
 router.get("/callback", UserController.callback)
 router.get("/me", UserController.getMe)
-router.get("/register", UserController.register)
+router.post("/register", UserController.register)
 router.get("/save-spotify-user", UserController.saveSpotifyUser)
 router.get("/currently", UserController.getCurrentlyPlaying)
 // Not for here but for now...
 router.get("/get-song", UserController.getSong)
+
+router.post("/pause", UserController.pause)
+// router.post("/next", UserController.playNext)
+// router.post("/prev", UserController.playPrev)
+router.post("/play", UserController.play)
+router.post("/play/track", UserController.playTrack)
+
 
 module.exports = router;
 

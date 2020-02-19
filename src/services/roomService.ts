@@ -1,6 +1,8 @@
 import { Service, Container } from "typedi";
 import SpotifyService from "./spotifyService";
-
+import Room from "../models/room";
+import User from "../models/user";
+import UserService from "./userService";
 require("dotenv").config();
 
 var { poolPromise, sql } = require("../db/db");
@@ -8,14 +10,45 @@ var { poolPromise, sql } = require("../db/db");
 @Service()
 export default class RoomService {
   private _spotifyService: any;
+  private _userService: any;
+  private activeRooms: Room[];
 
   constructor() {
     this._spotifyService = Container.get(SpotifyService);
+    this._userService =  Container.get(UserService);
+    this.activeRooms = [];
   }
 
-  public async getRoom() {
-    // TODO
-    return null;
+  public async getRoom(id: string) {
+    const pool = await poolPromise;
+    try {
+      const sqlreq = new sql.Request(pool);
+
+      const query = `SELECT *  FROM Room WHERE ID = ${id}`;
+
+      const result = await sqlreq.query(query);
+
+      console.log(JSON.stringify(result));
+
+      const room: Room = {
+        Id: id,
+        Name: result.recordset.Name,
+        OwnerID: result.recordset.OwnerID,
+        LastPlayed: result.recordset.LastPlayed,
+        PlaybackMS: result.recordset.PlaybackMS,
+        IsPlaying: result.recordset.IsPlaying,
+        Participants: [],
+        Queue: []
+      }
+
+      return Promise.resolve(room);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  public async getActiveRooms() {
+    return this.activeRooms;
   }
 
   public async getAllRooms() {
@@ -28,9 +61,7 @@ export default class RoomService {
                           ON [OwnerID] = [User].SpotifyAccountID`;
 
       const result = await sqlreq.query(query);
-      console.log("id: " + result.ID)
-      console.log("name: " + result.ID)
-      console.log("result: " + result.ID)
+
       let rooms: any = [];
 
       result.recordset.forEach((room: any) => rooms.push(room));
@@ -44,6 +75,14 @@ export default class RoomService {
   }
 
   public async getRoomTracks(id: string) {
+    // Stuff that this endpoint needs to send: 
+    // Array of objects with these params:
+    //  - Id
+    //  - roomName
+    //  - owner
+    //  - currentlyPlayingInRoom
+    //  - participants
+
     console.log("Getting room tracks.................");
     try {
       const pool = await poolPromise;
@@ -126,6 +165,8 @@ export default class RoomService {
         const result = await sqlreq.query(saveSongsQuery);
       });
 
+      this.addToActiveRoom(currentUser.id, id);
+
       console.dir(result);
       return Promise.resolve();
     } catch (error) {
@@ -178,9 +219,36 @@ export default class RoomService {
       resultTracksIDs.recordset.forEach((track: any) => {
         tracksIDs.push(`spotify:track:${track.ID}`);
       });
-
+      
       //console.log(tracksIDs);
       await this._spotifyService.play(tracksIDs);
+
+      const room = await this.getRoom(id);
+      room.Queue = tracksIDs;
+      this.activeRooms.push(room);
+
+      return Promise.resolve(room);
+    } catch (error) {
+      return Promise.reject();
+    }
+  }
+
+  public async deactivateRoom(id: string) {
+    try {
+      const pool = await poolPromise;
+      const sqlreq = new sql.Request(pool);
+
+      console.log("Deactivating room");
+
+      const activateQuery = `UPDATE [ROOM]
+                              SET IsPlaying = 0
+                              WHERE ID = '${id}'`;
+
+      const resultActivated = await sqlreq.query(activateQuery);
+      
+      //console.log(tracksIDs);
+
+      this.activeRooms.splice(this.activeRooms.findIndex(a=> a.Id === id),1);
 
       return Promise.resolve();
     } catch (error) {
@@ -245,4 +313,33 @@ export default class RoomService {
       return Promise.reject();
     }
   }
+
+  public async getRoomQueue(id: string){
+    let room = this.getActiveRoom(id);
+    return room.Queue;
+  }
+
+  public getActiveRoom(id: string){
+    let room = this.activeRooms[this.activeRooms.findIndex(a => a.Id === id)];
+    return room;
+  }
+
+  public changeRoomSong(roomId: string, songId: string, ms: string, isPlaying: boolean){
+    this.activeRooms[this.activeRooms.findIndex(a => a.Id === roomId)].PlaybackMS = ms;
+    this.activeRooms[this.activeRooms.findIndex(a => a.Id === roomId)].LastPlayed = songId;
+    this.activeRooms[this.activeRooms.findIndex(a => a.Id === roomId)].IsPlaying = isPlaying;
+  }
+
+  public setActiveRoom(room: Room){
+    this.activeRooms[this.activeRooms.findIndex(a => a.Id === room.Id)] = room;
+  }
+
+  private addToActiveRoom(user: string, id: string){
+    let room = this.getActiveRoom(id);
+
+    room.Participants.push(user);
+
+    this.setActiveRoom(room);
+  }
+
 }

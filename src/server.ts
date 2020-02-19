@@ -3,6 +3,8 @@ import express, { Response, Request } from "express";
 import path from "path";
 import { Socket } from "socket.io";
 
+const axios = require("axios");
+
 import { msToHMS } from "./controllers/userController";
 import { render } from "pug";
 
@@ -12,7 +14,6 @@ const room_router = require("./routes/room");
 const user_router = require("./routes/user");
 
 const socketIO = require("socket.io");
-const axios = require("axios");
 
 const app: express.Application = express();
 const port: number = +(process.env.PORT || 3000);
@@ -34,15 +35,86 @@ var server = app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}/`);
 });
 
+const io = socketIO(server);
+
 app.use("/rooms", room_router);
 app.use("/user", user_router);
+
 app.get("/", (req: Request, res: Response) => {
   res.render("home");
 });
-const io = socketIO(server);
 
-// TODO
-//   Fix this... You cant have a socket in the server file
+app.get("/player", (req: Request, res: Response) => {
+  res.render("player", {roomId: req.body.id});
+});
+
+app.get("/allrooms", (req: Request, res: Response) => {
+  res.render("rooms", { asd: "asd" });
+});
+
+
+app.post("/pause", (req: Request, res: Response) => {
+  try {
+    console.log("\x1b[35m", "Pause called");
+
+    io.on("connection", function(socket: Socket) {
+      socket.broadcast.emit("pause");
+    })
+    return Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+});
+
+app.post("/play", (req: Request, res: Response) => {
+  try {
+    console.log("\x1b[35m", "Pause called");
+
+    io.on("connection", function(socket: Socket) {
+      socket.broadcast.emit("play");
+    })
+    return Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+});
+
+// app.post("/next", async function () {
+//   try {
+//     let result = await this._spotifyService.nextSong();
+//     console.log(result);
+
+//     return Promise.resolve(result);
+//   } catch (error) {
+//     return Promise.reject(error);
+//   }
+// })
+
+// app.post("prev", function() {
+//   try {
+//     return Promise.resolve();
+//   } catch (error) {
+//     return Promise.reject(error);
+//   }
+// })
+
+app.post("/play/track", function(req: Request) {
+  try {
+    // console.log("\x1b[35m", "Play called");
+    io.on("connection", function(socket: Socket) {
+      socket.broadcast.emit("play", {
+        progress: msToHMS(req.query.ms),
+        id: req.query.id
+      });
+    })
+    return Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
+})
+
+// app.use("/playback", playback_controller);
+
 io.on("connection", function(socket: Socket) {
   console.log("New client connected");
   setInterval(async () => {
@@ -52,7 +124,9 @@ io.on("connection", function(socket: Socket) {
       const song = await axios.get(
         `${process.env.HOST_URL}/user/get-song?id=${curr.data.song_id}`
       );
-
+      if (!curr.data.is_playing) {
+        socket.broadcast.emit("pause");
+      }
       socket.broadcast.emit("playback", {
         progress: msToHMS(curr.data.songProgress),
         name: song.data.name,
@@ -71,68 +145,5 @@ io.on("connection", function(socket: Socket) {
     console.log("user disconnected");
   });
 });
-
-// app.post("/register", async (request: Request, response: Response) => {
-//   let userData = {
-//     Email: request.body.Email,
-//     Username: request.body.Username,
-//     Password: request.body.Password,
-//     RepeatedPassword: request.body.RepeatedPassword
-//   };
-
-//   const pool = new sql.ConnectionPool({
-//     server: "localhost\SQLEXPRESS",
-//     database: "SpotifyProject",
-//     options: {
-//       trustedConnection: true
-//     }
-//   });
-
-//   await pool.connect();
-
-//   try {
-//     const req = new sql.Request(pool);
-//     const passwordHash = require("password-hash");
-//     const hashedPassword = passwordHash.generate(userData.Password);
-//     const query = `INSERT INTO dbo.[User] (ID, Email, Username, Password)
-//                   VALUES(NEWID(), '${userData.Email}', '${userData.Username}', '${hashedPassword}')`;
-
-//     const result = await req.query(query);
-
-//     console.dir(result);
-//     response.redirect("http://localhost:3000/api/login");
-//   } catch (error) {
-//     response.send(error);
-//   }
-// });
-
-// app.get("/saveSpotifyUser", async (request: Request, response: Response) => {
-//   const pool = new sql.ConnectionPool({
-//     server: "localhost\SQLEXPRESS",
-//     database: "SpotifyProject",
-//     options: {
-//       trustedConnection: true
-//     }
-//   });
-
-//   await pool.connect();
-
-//   const req = new sql.Request(pool);
-
-//   try {
-//     const query = `UPDATE [User]
-//                 SET SpotifyAccountID = '${request.query.id}'
-//                 WHERE Email = '${request.query.email}'`;
-
-//     const result = await req.query(query);
-//     console.dir(result);
-
-//     response.redirect("http://localhost:3000/api/rooms");
-//   } catch (error) {
-//     response.send(error);
-//   }
-// });
-
-// app.get("/logout", function(req, res) {
-//   res.status(401).send("You are now logged out.");
-// });
+// TODO
+//   Fix this... You cant have a socket in the server file

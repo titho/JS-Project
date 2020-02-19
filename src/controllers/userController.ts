@@ -29,12 +29,12 @@ export async function callback(req: Request, res: Response) {
 export async function register(request: Request, response: Response) {
   try {
     let userData = {
-      Email: request.body.Email,
-      Username: request.body.Username,
-      Password: request.body.Password,
-      RepeatedPassword: request.body.RepeatedPassword
+      Email: request.body.email,
+      Username: request.body.username,
+      Password: request.body.password,
+      RepeatedPassword: request.body.reppassword
     };
-
+    console.log("register called");
     await _userService.register(userData);
 
     response.redirect(`${process.env.HOST_URL}/user/login`);
@@ -107,7 +107,7 @@ export async function playTrack(req: Request, res: Response) {
   try {
     const uri = req.query.uri;
     const ms = req.query.ms;
-    
+
     let result = await _userService.playTrack(ms, uri);
     res.send(result);
   } catch (err) {
@@ -119,7 +119,7 @@ export async function playTrack(req: Request, res: Response) {
 export async function getCurrentlyPlaying(req: Request, res: Response) {
   try {
     let result = await _userService.getCurrentlyPlaying();
-    
+
     res.send(result);
   } catch (err) {
     console.log("Something went wrong!", err);
@@ -298,17 +298,7 @@ export function msToHMS(millis: number) {
 //   }
 // }
 
-// export async function play_track(req: Request, res: Response) {
-//   try {
-//     const uri = req.query.uri;
-//     const ms = req.query.ms;
-//     console.log("\x1b[35m", "Seek called");
-//     let result = await SpotifyApi.setPlayback("Seek", ms, uri);
-//     res.send(result);
-//   } catch (err) {
-//     console.log("Cannot play song!", err);
-//   }
-// }
+
 
 // // Try to make it to check if user is active, if not, get last played song
 // export async function get_currently_playing(req: Request, res: Response) {

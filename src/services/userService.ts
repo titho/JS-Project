@@ -1,5 +1,6 @@
 import { Service, Container } from "typedi";
 import SpotifyService from "./spotifyService";
+import User from "../models/user";
 
 require("dotenv").config();
 
@@ -84,6 +85,30 @@ export default class UserService {
     }
   }
 
+  public async getUser(id: string) {
+    const pool = await poolPromise;
+    try {
+      const sqlreq = new sql.Request(pool);
+
+      const query = `SELECT *  FROM User WHERE ID = ${id}`;
+
+      const result = await sqlreq.query(query);
+
+      console.log(JSON.stringify(result));
+
+      const user: User = {
+        Id: id,
+        SpotifyID: result.recordset.SpotifyAccountID,
+        Email: result.recordset.Email,
+        Username: result.recordset.Username
+      }
+
+      return Promise.resolve(user);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   public async pause() {
     try {
       console.log("\x1b[35m", "Pause called");
@@ -158,7 +183,8 @@ export default class UserService {
         song_id: result.song_id,
         uri: result.uri,
         songProgress: result.songProgress,
-        image_url: result.image_url
+        image_url: result.image_url,
+        is_playing: result.is_playing
       });
     } catch (err) {
       console.log("Something went wrong!", err);
@@ -185,6 +211,8 @@ export default class UserService {
       });
     });
   }
+
+  
 
   public async getPlayer() {
     try {

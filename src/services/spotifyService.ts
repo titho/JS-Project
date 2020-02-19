@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 require("dotenv").config();
 
 const SpotifyWebApi = require("spotify-web-api-node");
-
+          
 @Service()
 export default class SpotifyService {
   private _spotifyApi: any;
@@ -133,7 +133,8 @@ export default class SpotifyService {
           song_id: data.body.item.id,
           uri: data.body.item.uri,
           songProgress: data.body.progress_ms,
-          image_url: data.body.item.album.images[0].url
+          image_url: data.body.item.album.images[0].url,
+          is_playing: data.body.is_playing
         };
       },
       function(err: Error) {
