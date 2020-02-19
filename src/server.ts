@@ -39,6 +39,11 @@ app.use("/user", user_router);
 app.get("/", (req: Request, res: Response) => {
   res.render("home");
 });
+app.get("/allrooms", (req: Request, res: Response) => {
+  console.log(req);
+  console.log(res);
+  res.render("rooms", {asd: "asd"});
+});
 const io = socketIO(server);
 
 // TODO

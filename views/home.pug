@@ -68,7 +68,7 @@ nav.navbar.fixed-top.navbar-expand-lg.navbar-dark.scrolling-navbar
             p.mb-4.d-none.d-md-block
               strong
                 | Listen together with your friends whereever you are.
-            a#browse.btn.btn-outline-white.btn-lg(target='_blank' href='#' onclick="window.location='http://localhost:3000/allrooms'")
+            a#browse.btn.btn-outline-white.btn-lg(target='_blank' data-toggle="modal" data-target="#modalLoginForm")
               | Browse our rooms
               i.fas.fa-sign-in-alt.ml-3
     .carousel-item
@@ -235,10 +235,12 @@ main
                         type: 'POST', //or POST
                         data: `Username=${username}&Email=${email}&Password=${pass}&RepeatPassword=${reppass}`,
                         success: function(data){
-                             alert('Success')                     
+                             alert('Success');
+                             location.reload();
                         },
                         error: function(error) {
                             alert('Could not register', error);
+                             location.reload();
                         }
                     });
                 });
@@ -275,11 +277,12 @@ main
                         type: 'POST', //or POST
                         data: `Username=${username}&Password=${password}`,
                         success: function(data){
-                          console.log(data);
+                          //- console.log(data);
                           window.location.href = data;
                         },
                         error: function(error) {
                           alert('Failed to login.', error);
+                             location.reload();
                         } 
                     });
                 });
