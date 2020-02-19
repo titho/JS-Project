@@ -9,6 +9,7 @@ head
   link(rel='stylesheet' href='https://use.fontawesome.com/releases/v5.8.2/css/all.css')
   link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap')
   link(rel='stylesheet' href='https://use.fontawesome.com/releases/v5.11.2/css/all.css')
+  script(type="text/javascript" src='https://code.jquery.com/jquery-1.11.1.js')
   link(href='index.css' rel='stylesheet')
   title Index
   style(type='text/css').
@@ -22,7 +23,7 @@ nav.navbar.fixed-top.navbar-expand-lg.navbar-dark.scrolling-navbar
   .container
     // Brand
     a.navbar-brand(href='#' target='_blank')
-      strong MDB
+      strong YOLO
     // Collapse
     button.navbar-toggler(type='button' data-toggle='collapse' data-target='#navbarSupportedContent' aria-controls='navbarSupportedContent' aria-expanded='false' aria-label='Toggle navigation')
       span.navbar-toggler-icon
@@ -193,9 +194,9 @@ main
               p.grey-text
                 | Ох, баня, ох, кеф. Селската бaня-голям кеф.
               div(style='height:15px')
-#modalRegisterForm.modal.fade(tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true')
+#modalRegisterForm.modal.fade(tabindex='-1' role='dialog' aria-labelledby='modalRegisterForm' aria-hidden='true')
     .modal-dialog(role='document')
-      .modal-content
+      .modal-content#content
         .modal-header.text-center
             h4.modal-title.w-100.font-weight-bold Sign up
             button.close(type='button' data-dismiss='modal' aria-label='Close')
@@ -203,7 +204,7 @@ main
         .modal-body.mx-3
           .md-form.mb-5
             i.fas.fa-user.prefix.grey-text
-            input#username-name.form-control.validate(type='text')
+            input#username.form-control.validate(type='text')
             label(data-error='Invalid input' for='username') Username
           .md-form.mb-5
             i.fas.fa-envelope.prefix.grey-text
@@ -218,9 +219,28 @@ main
             input#reppassword.form-control.validate(type='password')
             label(data-error='Invalid input' for='reppassword') Repeat password
         .modal-footer.d-flex.justify-content-center
-          button.btn.btn-deep-orange Register
+          button.btn.btn-deep-orange#register(type="submit") Register
+          script.
+            $(function(){
+                $('#register').click(function(e){
+                    e.preventDefault();
+                    var $inputs = $('#modalRegisterForm :input');
+                    var username = $inputs[1].value;
+                    var email = $inputs[2].value;
+                    var pass = $inputs[3].value;
+                    var reppass = $inputs[4].value;
+                    $.ajax({
+                        url: 'http://localhost:3000/user/register', //this is the submit URL
+                        type: 'POST', //or POST
+                        data: `username=${username}&email=${email}&password=${pass}&reppassword=${reppass}`,
+                        success: function(data){
+                             alert('Success')
+                        }
+                    });
+                });
+            });
           .text-center
-#modalLoginForm.modal.fade(tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true')
+#modalLoginForm.modal.fade(tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true' action='http://localhost:3000/user/login')
     .modal-dialog(role='document')
       .modal-content
         .modal-header.text-center
@@ -237,15 +257,29 @@ main
             input#password.form-control.validate(type='password')
             label(data-error='Invalid input' data-success='right' for='password') Password
         .modal-footer.d-flex.justify-content-center
-          button.btn.btn-default Login
+          button.btn.btn-default#login Login
+          script.
+            $(function(){
+                $('#login').click(function(e){
+                    e.preventDefault();
+                    var $inputs = $('#modalLoginForm :input');
+                    var username = $inputs[1].value;
+                    var password = $inputs[2].value;
+
+                    $.ajax({
+                        url: 'http://localhost:3000/user/login', //this is the submit URL
+                        type: 'POST', //or POST
+                        data: `username=${username}&password=${password}`,
+                        success: function(data){
+                             alert('Success')
+                        }
+                    });
+                });
+            });
 footer.page-footer.text-center.font-small.mt-4.wow.fadeIn
   .footer-copyright.py-3
     | &copy; 2020 Гъзарске фуутър
-script(src='https://code.jquery.com/jquery-1.11.1.js')
 script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js')
 script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js')
 script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.12.0/js/mdb.min.js')
 script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js')
-script(type='text/javascript').
-  // Animations initialization
-  new WOW().init();
