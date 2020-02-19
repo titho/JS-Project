@@ -108,16 +108,17 @@ export default class RoomService {
 
     try {
       const sqlreq = new sql.Request(pool);
-
+      console.log(currentUser.id);
+      console.log(id);
       const query = `INSERT INTO User_Room(ID, Ref_User_ID, Ref_Room_ID)
-                          VALUES(NEWID(), ${currentUser.id}, '${id}')`;
-
+                          VALUES(NEWID(), '${currentUser.id}', '${id}')`;
+      console.log(query);
       const result = await sqlreq.query(query);
       console.log("Entered room successfully.");
 
       tracks.forEach(async (track: any) => {
         const saveSongsQuery = `INSERT INTO dbo.Song(ID, Name, Artists, FK_Ref_Room)
-                                    VALUES('${track.id}', '${track.name.replace(
+                                    VALUES('${track.id.toString()}', '${track.name.replace(
           "'",
           ""
         )}', '${track.artist.replace("'", "")}', '${id}')`;
@@ -128,7 +129,7 @@ export default class RoomService {
       return Promise.resolve();
     } catch (error) {
       console.log(error);
-      return Promise.reject("Already in room!");
+      return Promise.reject(error);
     }
   }
 
