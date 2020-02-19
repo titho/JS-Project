@@ -13,9 +13,27 @@ export default class UserService {
   constructor() {
     this._spotifyService = Container.get(SpotifyService);
   }
-  public async login() {
-    var authenticationUrl = await this._spotifyService.login();
-    return authenticationUrl;
+
+  public async login(userData: any) {
+    const pool = await poolPromise;
+
+    const query = `SELECT Password FROM [User] 
+                      WHERE ID IN 
+                      (SELECT ID FROM [User] 
+                          WHERE Username = '${userData.Username}')`;
+
+    const req = new sql.Request(pool);
+
+    const result = await req.query(query);
+    const passwordHash = require("password-hash");
+
+    if (passwordHash.verify(userData.Password, result.recordset[0].Password)) {
+      const authenticationUrl = await this._spotifyService.login();
+      return authenticationUrl;
+
+    } else {
+      throw "Failed to log in.";
+    }
   }
 
   public async callback(authorizationCode: string) {
@@ -36,14 +54,15 @@ export default class UserService {
   public async register(userData: any) {
     const pool = await poolPromise;
 
-    // await pool.connect((err: Error) => {
-    //   console.log("Error connection to db...");
-    // });
-
     try {
+      // await pool.connect((err: Error) => {
+      //   console.log("Error connection to db...", err);
+      // });
+
       const req = new sql.Request(pool);
       const passwordHash = require("password-hash");
       const hashedPassword = passwordHash.generate(userData.Password);
+
       const query = `INSERT INTO dbo.[User] (ID, Email, Username, Password)
                   VALUES(NEWID(), '${userData.Email}', '${userData.Username}', '${hashedPassword}')`;
 
