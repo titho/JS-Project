@@ -55,7 +55,7 @@ export async function saveSpotifyUser(request: Request, response: Response) {
 
     await _userService.saveSpotifyUser(id, email);
 
-    response.redirect(`${process.env.HOST_URL}/allrooms`);
+    response.redirect(`${process.env.HOST_URL}/rooms/browse`);
   } catch (error) {
     response.send(error);
   }

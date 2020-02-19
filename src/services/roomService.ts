@@ -28,9 +28,7 @@ export default class RoomService {
                           ON [OwnerID] = [User].SpotifyAccountID`;
 
       const result = await sqlreq.query(query);
-      console.log("id: " + result.ID)
-      console.log("name: " + result.ID)
-      console.log("result: " + result.ID)
+
       let rooms: any = [];
 
       result.recordset.forEach((room: any) => rooms.push(room));
