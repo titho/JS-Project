@@ -49,7 +49,7 @@ app.get("/player", (req: Request, res: Response) => {
 });
 
 app.get("/allrooms", (req: Request, res: Response) => {
-  res.render("rooms", {asd: "asd"});
+  res.render("rooms", {data: "asd"});
 });
 
 
