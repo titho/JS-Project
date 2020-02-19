@@ -9,7 +9,7 @@ var router = express.Router();
 //     and is basically the room you are in right now.
 // router.get("/", RoomControler.get_room)
 // Get all rooms
-router.get("/browse", RoomControler.getAllRooms)
+router.get("/browse", RoomControler.browseRooms)
 // Get tracks for room
 router.get("/tracks", RoomControler.getRoomTracks)
 router.post("/create", RoomControler.createRoom)
@@ -17,13 +17,11 @@ router.post("/create", RoomControler.createRoom)
 router.post("/join", RoomControler.joinRoom)
 router.post("/leave", RoomControler.leaveRoom)
 router.put("/activate", RoomControler.activateRoom)
+router.put("/set", RoomControler.changeRoomSong)
+router.put("/get", RoomControler.getActiveRoom)
 
 // Player controls
-// router.post("/pause", RoomControler.pause)
-// router.post("/next", RoomControler.play_next)
-// router.post("/prev", RoomControler.play_prev)
-// router.post("/play", RoomControler.play)
-// router.post("/play/track", RoomControler.play_track)
+
 
 
 module.exports = router;
