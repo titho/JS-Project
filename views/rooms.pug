@@ -57,7 +57,7 @@ main.mt-5.pt-5(style="background: rgb(240,231,236);background: linear-gradient(0
     // Section: Cards
     section.text-center
         .row.mb-4.wow.fadeIn
-            each room in asd
+            each room in data
                     .col-lg-4.col-md-6.mb-4
                         // Card
                         .card
@@ -69,12 +69,35 @@ main.mt-5.pt-5(style="background: rgb(240,231,236);background: linear-gradient(0
                           // Card content
                           .card-body
                             // Title
-                            h4.card-title MDB with React
+                            h4.card-title= "Room: " + room.Name
                             // Text
-                            p.card-text Based on the latest Bootstrap 4 and React 16. 
-                            a.btn.btn-primary.btn-md(href='https://mdbootstrap.com/react/' target='_blank')
+                            p.card-text= "Room's owner: " + room.Username
+                            p.card-text= "\nLastPlayed: " + room.LastPlayed
+                            p.card-text="\nID: " + room.ID
+
+                            a.btn.btn-primary.btn-md(href='#' target='_blank')#join
                               | Join
-                              //- i.fas.fa-download.ml-2
+        script.
+          $(function(){
+              $('#join').click(function(e){
+                  e.preventDefault();  
+                  const self = this;                               
+
+                  $.ajax({
+                      url: `http://localhost:3000/rooms/join?id=${self.parentElement.children[3].innerText.split(':')[1].trim()}`, //this is the submit URL
+                      type: 'POST', //or POST
+                      success: function(data){
+                        console.log(data);
+                        alert(data);
+                        //window.location.href = data;
+                      },
+                      error: function(error) {
+                        alert(error);
+                          location.reload();
+                      } 
+                  });
+              });
+          });
         // Pagination
         nav.d-flex.justify-content-center.wow.fadeIn
           ul.pagination.pg-blue
@@ -139,7 +162,9 @@ script.
                              location.reload();
                         },
                         error: function(error) {
+                          console.log(error);
                           alert("Failed", error);
+                          location.reload();
                         }
                     });
                 });
