@@ -10,7 +10,7 @@ const _roomService = Container.get(RoomService);
 export async function getAllRooms(req: Request, res: Response) {
   try {
     let result = await _roomService.getAllRooms();
-    res.render("chooseroom", result);
+    res.render("rooms", {data: result});
   } catch (error) {
     res.send("Error getting the rooms: " + error);
   }

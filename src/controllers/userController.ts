@@ -9,7 +9,12 @@ require("dotenv").config();
 const _userService = Container.get(UserService);
 
 export async function login(req: Request, res: Response) {
-  var authenticationUrl = await _userService.login();
+  const userData = {
+    Username: req.body.Username,
+    Password: req.body.Password
+  };
+
+  const authenticationUrl = await _userService.login(userData);
 
   res.send(authenticationUrl + "&show_dialog=true");
 }
@@ -20,7 +25,7 @@ export async function callback(req: Request, res: Response) {
     var authorizationCode = req.query.code;
 
     await _userService.callback(authorizationCode);
-    res.redirect(`${process.env.HOST_URL}/rooms/browse`);
+    res.redirect(`${process.env.HOST_URL}/user/me`);
   } catch (err) {
     throw err;
   }
@@ -36,8 +41,8 @@ export async function register(request: Request, response: Response) {
     };
     console.log("register called");
     await _userService.register(userData);
-
-    response.redirect(`${process.env.HOST_URL}/user/login`);
+    
+    //response.redirect(`${process.env.HOST_URL}/user/login`);
   } catch (error) {
     response.send(error);
   }
@@ -50,7 +55,7 @@ export async function saveSpotifyUser(request: Request, response: Response) {
 
     await _userService.saveSpotifyUser(id, email);
 
-    response.redirect(`${process.env.HOST_URL}/rooms`);
+    response.redirect(`${process.env.HOST_URL}/rooms/browse`);
   } catch (error) {
     response.send(error);
   }

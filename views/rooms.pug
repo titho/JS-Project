@@ -19,7 +19,7 @@ header
   nav.navbar.fixed-top.navbar-expand-lg.navbar-dark.bg-dark.scrolling-navbar
     .container
       // Brand
-      a.navbar-brand.waves-effect(href='https://mdbootstrap.com/docs/jquery/' target='_blank')
+      a.navbar-brand.waves-effect(href='#' target='_blank')
         strong.blue-text YOLO
       // Collapse
       button.navbar-toggler(type='button' data-toggle='collapse' data-target='#navbarSupportedContent' aria-controls='navbarSupportedContent' aria-expanded='false' aria-label='Toggle navigation')
@@ -32,9 +32,7 @@ header
               | Home
               span.sr-only (current)
           li.nav-item
-            a.nav-link(target='_blank' data-toggle="modal" data-target="#modalLoginForm") Login
-          li.nav-item
-            a.nav-link(target='_blank' data-toggle="modal" data-target="#modalRegisterForm") Register
+            a.nav-link(target='_blank' data-toggle="modal" data-target="#modalCreateRoomForm") Create room
         // Right
         ul.navbar-nav.nav-flex-icons
           li.nav-item
@@ -47,14 +45,12 @@ header
 main.mt-5.pt-5(style="background: rgb(240,231,236);background: linear-gradient(0deg, rgba(240,231,236,1) 0%, rgba(164,118,244,0.8155637254901961) 50%, rgba(87,5,251,0.5970763305322129) 100%);")
   .container
     // Section: Jumbotron
-    section.card.wow.fadeIn(style='background-image: url(img/browse.jpeg); filter: blur(0.8); background-size:cover;')
+    section.card.wow.fadeIn(style='height: 150px; background-image: url(img/browse.jpeg); filter: blur(0.8); background-size:cover;')
       // Content
       .card-body.text-white.text-center.py-5.px-5.my-5
-        h1.mb-4(style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;")
+        h1.mb-4(style="margin-top: -50px; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;ss")
           strong Choose a room! 
-        p(style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;")
-          strong КАТО ВОЛНА ПЕПЕРУДААА
-        p.mb-4
+        
       // Content
     // Section: Jumbotron
     hr.my-5
@@ -68,7 +64,7 @@ main.mt-5.pt-5(style="background: rgb(240,231,236);background: linear-gradient(0
                           // Card image
                           .view.overlay
                             img.card-img-top(src='https://mdbootstrap.com/img/Marketing/mdb-press-pack/mdb-react.jpg' alt='')
-                            a(href='https://mdbootstrap.com/react/' target='_blank')
+                            a(href='#' target='_blank')
                               .mask.rgba-white-slight
                           // Card content
                           .card-body
@@ -77,8 +73,8 @@ main.mt-5.pt-5(style="background: rgb(240,231,236);background: linear-gradient(0
                             // Text
                             p.card-text Based on the latest Bootstrap 4 and React 16. 
                             a.btn.btn-primary.btn-md(href='https://mdbootstrap.com/react/' target='_blank')
-                              | Free download
-                              i.fas.fa-download.ml-2
+                              | Join
+                              //- i.fas.fa-download.ml-2
         // Pagination
         nav.d-flex.justify-content-center.wow.fadeIn
           ul.pagination.pg-blue
@@ -112,6 +108,43 @@ script.
             return out
         }, []);
     }
+
+#modalCreateRoomForm.modal.fade(tabindex='-1' role='dialog' aria-labelledby='modalCreateRoomForm' aria-hidden='true' action='http://localhost:3000/create')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header.text-center
+          h4.modal-title.w-100.font-weight-bold Create room
+          button.close(type='button' data-dismiss='modal' aria-label='Close')
+            span(aria-hidden='true') &times;
+        .modal-body.mx-3
+          .md-form.mb-5
+            i.fas.fa-user.prefix.grey-text
+            input#name.form-control.validate(type='text')
+            label(data-error='Invalid input' data-success='right' for='name') Name
+        .modal-footer.d-flex.justify-content-center
+          button.btn.btn-default#create Create
+          script.
+            $(function(){
+                $('#create').click(function(e){
+                    e.preventDefault();
+                    const $inputs = $('#modalCreateRoomForm :input');
+                    const name = $inputs[1].value;
+
+                    $.ajax({
+                        url: 'http://localhost:3000/rooms/create', //this is the submit URL
+                        type: 'POST', //or POST
+                        data: `Name=${name}`,
+                        success: function(data){
+                             alert('Success');
+                             location.reload();
+                        },
+                        error: function(error) {
+                          alert("Failed", error);
+                        }
+                    });
+                });
+            });
+
 script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js')
 script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js')
 script(type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.12.0/js/mdb.min.js')

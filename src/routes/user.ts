@@ -6,7 +6,7 @@ var express = require('express');
 var router = express.Router();
 
 // At this point the url has /user at the end
-router.get("/login", UserController.login)
+router.post("/login", UserController.login)
 router.get("/callback", UserController.callback)
 router.get("/me", UserController.getMe)
 router.post("/register", UserController.register)
